@@ -39,6 +39,9 @@ RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg \
     && apt-get update && apt-get install -y --no-install-recommends tailscale \
     && rm -rf /var/lib/apt/lists/*
 
+# Install ZeroTier
+RUN curl -fsSL https://install.zerotier.com | bash
+
 # Install Cloudflare Tunnel (cloudflared)
 RUN curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg \
       -o /usr/share/keyrings/cloudflare-main.gpg \

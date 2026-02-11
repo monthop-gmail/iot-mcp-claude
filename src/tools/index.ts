@@ -92,7 +92,7 @@ export const TOOLS: Tool[] = [
   },
   {
     name: 'vpn_status',
-    description: 'Check status of all VPN connections (OpenVPN, WireGuard, Tailscale, Cloudflare Tunnel)',
+    description: 'Check status of all VPN connections (OpenVPN, WireGuard, Tailscale, Cloudflare Tunnel, ZeroTier)',
     inputSchema: {
       type: 'object',
       properties: {},

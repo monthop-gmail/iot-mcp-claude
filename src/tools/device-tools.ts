@@ -90,12 +90,14 @@ export async function vpnStatus() {
     wireguard: Array<{ name: string; status: string; peers?: number }>;
     tailscale: { status: string; ip?: string; hostname?: string };
     cloudflare: { status: string; pid?: number; connector_id?: string };
+    zerotier: { status: string; address?: string; networks?: Array<{ id: string; name: string; status: string }> };
     interfaces: string;
   } = {
     openvpn: [],
     wireguard: [],
     tailscale: { status: 'not running' },
     cloudflare: { status: 'not running' },
+    zerotier: { status: 'not running' },
     interfaces: '',
   };
 
@@ -163,6 +165,26 @@ export async function vpnStatus() {
         const connMatch = cfLog.match(/Registered tunnel connection\s+connIndex=\d+\s+connection=([a-f0-9-]+)/);
         if (connMatch) {
           result.cloudflare.connector_id = connMatch[1];
+        }
+      } catch { /* ignore */ }
+    }
+  } catch { /* ignore */ }
+
+  // Check ZeroTier
+  try {
+    const ztInfo = execSync('zerotier-cli info -j 2>/dev/null || true', { encoding: 'utf-8' }).trim();
+    if (ztInfo && ztInfo.startsWith('{')) {
+      const zt = JSON.parse(ztInfo);
+      result.zerotier = {
+        status: zt.online ? 'online' : 'offline',
+        address: zt.address,
+      };
+      try {
+        const ztNets = execSync('zerotier-cli listnetworks -j 2>/dev/null || true', { encoding: 'utf-8' }).trim();
+        if (ztNets && ztNets.startsWith('[')) {
+          result.zerotier.networks = JSON.parse(ztNets).map((n: { id: string; name: string; status: string }) => ({
+            id: n.id, name: n.name, status: n.status,
+          }));
         }
       } catch { /* ignore */ }
     }

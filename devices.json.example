@@ -67,7 +67,7 @@
       "transport": ["rest"],
       "apiUrl": "http://192.168.1.50:6052",
       "apiKey": "${ESPHOME_API_KEY}",
-      "vpn": "cloudflare",
+      "vpn": "zerotier",
       "tags": ["iot", "esphome"]
     },
     {

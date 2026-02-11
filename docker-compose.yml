@@ -23,6 +23,7 @@ services:
       - ./vpn/openvpn:/etc/openvpn/client:ro
       - ./vpn/wireguard:/etc/wireguard:ro
       - tailscale_state:/var/lib/tailscale
+      - zerotier_state:/var/lib/zerotier-one
     env_file:
       - .env
     environment:
@@ -33,6 +34,7 @@ services:
       # Tailscale (set TS_AUTHKEY in .env to enable)
       # - TS_EXTRA_ARGS=--advertise-tags=tag:server
       # Cloudflare Tunnel (set CF_TUNNEL_TOKEN in .env to enable)
+      # ZeroTier (set ZT_NETWORKS in .env, comma-separated network IDs)
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
       interval: 30s
@@ -42,3 +44,4 @@ services:
 
 volumes:
   tailscale_state:
+  zerotier_state:

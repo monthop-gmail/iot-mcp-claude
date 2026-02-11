@@ -46,6 +46,21 @@ if [ -n "$TS_AUTHKEY" ]; then
 fi
 
 # -------------------------------------------------------
+# ZeroTier: join networks if ZT_NETWORKS is set
+# -------------------------------------------------------
+if [ -n "$ZT_NETWORKS" ]; then
+  echo "[VPN] Starting ZeroTier daemon..."
+  zerotier-one -d 2>/dev/null
+  sleep 2
+  for net in $(echo "$ZT_NETWORKS" | tr ',' ' '); do
+    echo "[VPN] Joining ZeroTier network: $net"
+    zerotier-cli join "$net" 2>/dev/null || echo "  Warning: failed to join $net"
+  done
+  echo "[VPN] ZeroTier status:"
+  zerotier-cli info 2>/dev/null || echo "  (not running)"
+fi
+
+# -------------------------------------------------------
 # Cloudflare Tunnel: start if CF_TUNNEL_TOKEN is set
 # -------------------------------------------------------
 if [ -n "$CF_TUNNEL_TOKEN" ]; then
@@ -82,6 +97,8 @@ cleanup() {
     tailscale down 2>/dev/null || true
     kill $(cat /var/run/tailscale/tailscaled.pid 2>/dev/null) 2>/dev/null || true
   fi
+  # Stop ZeroTier
+  killall zerotier-one 2>/dev/null || true
   # Stop Cloudflare Tunnel
   killall cloudflared 2>/dev/null || true
   # Stop OpenVPN

@@ -231,7 +231,7 @@ npm start           # stdio mode (for Claude Desktop)
 
 ## VPN Support
 
-Container รองรับ 4 VPN protocols เพื่อเข้าถึงอุปกรณ์ที่อยู่หลัง VPN:
+Container รองรับ 5 VPN protocols เพื่อเข้าถึงอุปกรณ์ที่อยู่หลัง VPN:
 
 | VPN | Config Location | Auto-connect |
 |-----|----------------|--------------|
@@ -239,6 +239,7 @@ Container รองรับ 4 VPN protocols เพื่อเข้าถึ�
 | **WireGuard** | `vpn/wireguard/*.conf` | ทุก .conf file |
 | **Tailscale** | `TS_AUTHKEY` in `.env` | เมื่อมี authkey |
 | **Cloudflare Tunnel** | `CF_TUNNEL_TOKEN` in `.env` | เมื่อมี token |
+| **ZeroTier** | `ZT_NETWORKS` in `.env` | เมื่อมี network IDs |
 
 ### Setup OpenVPN
 
@@ -263,6 +264,16 @@ cp wg0.conf vpn/wireguard/
 ```
 TS_AUTHKEY=tskey-auth-xxxxxxxxxxxxx
 ```
+
+### Setup ZeroTier
+
+สร้าง network ที่ [my.zerotier.com](https://my.zerotier.com/) แล้วใส่ network ID ใน `.env` (หลาย network คั่นด้วย comma):
+
+```
+ZT_NETWORKS=af78bf9436abcdef
+```
+
+อย่าลืม authorize member ใน ZeroTier Central หลัง container join แล้ว
 
 ### Setup Cloudflare Tunnel
 
@@ -327,6 +338,7 @@ devices:
 | `NODE_TLS_REJECT_UNAUTHORIZED` | - | Set to `0` for self-signed certs |
 | `TS_AUTHKEY` | - | Tailscale auth key (auto-connect) |
 | `CF_TUNNEL_TOKEN` | - | Cloudflare Tunnel token (auto-connect) |
+| `ZT_NETWORKS` | - | ZeroTier network IDs (comma-separated) |
 
 ## Tech Stack
 
@@ -337,4 +349,4 @@ devices:
 - **Serial**: serialport (native bindings)
 - **HTTP**: Native fetch (Node 22 built-in)
 - **Docker**: node:22-slim multi-stage build
-- **VPN**: OpenVPN, WireGuard, Tailscale, Cloudflare Tunnel (built into container)
+- **VPN**: OpenVPN, WireGuard, Tailscale, Cloudflare Tunnel, ZeroTier (built into container)
