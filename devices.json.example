@@ -1,0 +1,104 @@
+{
+  "devices": [
+    {
+      "id": "cisco-sw-core",
+      "name": "Cisco Core Switch",
+      "type": "cisco",
+      "transport": ["ssh"],
+      "host": "192.168.1.1",
+      "port": 22,
+      "username": "admin",
+      "password": "${CISCO_CORE_PASSWORD}",
+      "enablePassword": "${CISCO_CORE_ENABLE}",
+      "tags": ["core", "network", "switch"]
+    },
+    {
+      "id": "hp-sw-floor2",
+      "name": "HP Switch Floor 2",
+      "type": "hp",
+      "transport": ["ssh"],
+      "host": "192.168.1.2",
+      "port": 22,
+      "username": "manager",
+      "password": "${HP_FLOOR2_PASSWORD}",
+      "tags": ["access", "network", "switch"]
+    },
+    {
+      "id": "fg-01",
+      "name": "Fortigate Firewall",
+      "type": "fortigate",
+      "transport": ["rest", "ssh"],
+      "host": "192.168.1.254",
+      "apiUrl": "https://192.168.1.254",
+      "apiKey": "${FORTIGATE_API_KEY}",
+      "username": "admin",
+      "password": "${FORTIGATE_SSH_PASSWORD}",
+      "tags": ["firewall", "network", "perimeter"]
+    },
+    {
+      "id": "mikrotik-gw",
+      "name": "Mikrotik Gateway Router",
+      "type": "mikrotik",
+      "transport": ["rest", "ssh"],
+      "host": "192.168.1.253",
+      "apiUrl": "https://192.168.1.253",
+      "port": 22,
+      "username": "admin",
+      "password": "${MIKROTIK_PASSWORD}",
+      "extra": { "apiPort": 8728 },
+      "tags": ["router", "network", "gateway"]
+    },
+    {
+      "id": "tb-server",
+      "name": "ThingsBoard Server",
+      "type": "thingsboard",
+      "transport": ["rest"],
+      "apiUrl": "http://192.168.1.100:8080",
+      "username": "tenant@thingsboard.org",
+      "password": "${THINGSBOARD_PASSWORD}",
+      "tags": ["iot", "platform"]
+    },
+    {
+      "id": "esphome-01",
+      "name": "ESPHome Controller",
+      "type": "esphome",
+      "transport": ["rest"],
+      "apiUrl": "http://192.168.1.50:6052",
+      "apiKey": "${ESPHOME_API_KEY}",
+      "tags": ["iot", "esphome"]
+    },
+    {
+      "id": "espconnect-01",
+      "name": "ESPConnect Hub",
+      "type": "espconnect",
+      "transport": ["rest"],
+      "apiUrl": "http://192.168.1.51:80",
+      "apiKey": "${ESPCONNECT_API_KEY}",
+      "tags": ["iot", "espconnect"]
+    },
+    {
+      "id": "tuya-cloud",
+      "name": "Tuya Cloud Account",
+      "type": "tuya",
+      "transport": ["rest"],
+      "apiUrl": "https://openapi.tuyaus.com",
+      "extra": {
+        "clientId": "${TUYA_CLIENT_ID}",
+        "clientSecret": "${TUYA_CLIENT_SECRET}"
+      },
+      "tags": ["iot", "cloud", "tuya"]
+    },
+    {
+      "id": "sonoff-cloud",
+      "name": "Sonoff/eWeLink Cloud",
+      "type": "sonoff",
+      "transport": ["rest"],
+      "apiUrl": "https://us-apia.coolkit.cc",
+      "extra": {
+        "appId": "${EWELINK_APP_ID}",
+        "appSecret": "${EWELINK_APP_SECRET}"
+      },
+      "tags": ["iot", "cloud", "sonoff"]
+    }
+  ]
+}
