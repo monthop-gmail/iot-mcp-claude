@@ -8,6 +8,7 @@ import * as esphomeTools from './esphome-tools.js';
 import * as espconnectTools from './espconnect-tools.js';
 import * as tuyaTools from './tuya-tools.js';
 import * as sonoffTools from './sonoff-tools.js';
+import * as qnapTools from './qnap-tools.js';
 
 export const TOOLS: Tool[] = [
   // ============================================================
@@ -720,6 +721,99 @@ export const TOOLS: Tool[] = [
       required: ['device_id', 'sonoff_device_id'],
     },
   },
+
+  // ============================================================
+  // QNAP NAS Tools
+  // ============================================================
+  {
+    name: 'qnap_system_info',
+    description: 'Get QNAP NAS system information (model, firmware, uptime)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'QNAP NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'qnap_get_volumes',
+    description: 'Get storage volumes/pools info from QNAP NAS (RAID, capacity, usage)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'QNAP NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'qnap_get_disks',
+    description: 'Get physical disk info from QNAP NAS (SMART, health, temperature)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'QNAP NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'qnap_get_shared_folders',
+    description: 'List shared folders on QNAP NAS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'QNAP NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'qnap_get_network',
+    description: 'Get network interface configuration from QNAP NAS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'QNAP NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'qnap_get_apps',
+    description: 'List running applications/packages on QNAP NAS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'QNAP NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'qnap_get_logs',
+    description: 'Get system logs from QNAP NAS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'QNAP NAS device ID' },
+        count: { type: 'number', description: 'Number of log entries (default 50)' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'qnap_resource_usage',
+    description: 'Get CPU, memory, and disk usage from QNAP NAS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'QNAP NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
 ];
 
 export type ToolArguments = Record<string, unknown>;
@@ -860,6 +954,24 @@ export async function handleToolCall(
       return sonoffTools.toggleDevice(args as Parameters<typeof sonoffTools.toggleDevice>[0]);
     case 'sonoff_get_power_usage':
       return sonoffTools.getPowerUsage(args as Parameters<typeof sonoffTools.getPowerUsage>[0]);
+
+    // QNAP
+    case 'qnap_system_info':
+      return qnapTools.getSystemInfo(args as Parameters<typeof qnapTools.getSystemInfo>[0]);
+    case 'qnap_get_volumes':
+      return qnapTools.getVolumes(args as Parameters<typeof qnapTools.getVolumes>[0]);
+    case 'qnap_get_disks':
+      return qnapTools.getDisks(args as Parameters<typeof qnapTools.getDisks>[0]);
+    case 'qnap_get_shared_folders':
+      return qnapTools.getSharedFolders(args as Parameters<typeof qnapTools.getSharedFolders>[0]);
+    case 'qnap_get_network':
+      return qnapTools.getNetworkInterfaces(args as Parameters<typeof qnapTools.getNetworkInterfaces>[0]);
+    case 'qnap_get_apps':
+      return qnapTools.getRunningApps(args as Parameters<typeof qnapTools.getRunningApps>[0]);
+    case 'qnap_get_logs':
+      return qnapTools.getSystemLogs(args as Parameters<typeof qnapTools.getSystemLogs>[0]);
+    case 'qnap_resource_usage':
+      return qnapTools.getResourceUsage(args as Parameters<typeof qnapTools.getResourceUsage>[0]);
 
     default:
       throw new Error(`Unknown tool: ${name}`);

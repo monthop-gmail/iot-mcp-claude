@@ -9,7 +9,8 @@ export type DeviceType =
   | 'esphome'
   | 'espconnect'
   | 'tuya'
-  | 'sonoff';
+  | 'sonoff'
+  | 'qnap';
 
 export type ConnectionStatus = 'connected' | 'disconnected' | 'error' | 'unknown';
 

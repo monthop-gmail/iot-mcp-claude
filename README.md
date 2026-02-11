@@ -2,7 +2,7 @@
 
 MCP (Model Context Protocol) Server สำหรับจัดการอุปกรณ์ IoT และ Network ผ่าน Claude AI
 
-รองรับ **56 tools** สำหรับ **9 ประเภทอุปกรณ์** ผ่าน 3 protocols: SSH, REST API, Serial
+รองรับ **65 tools** สำหรับ **10 ประเภทอุปกรณ์** ผ่าน 3 protocols: SSH, REST API, Serial
 
 ## Supported Devices
 
@@ -17,6 +17,7 @@ MCP (Model Context Protocol) Server สำหรับจัดการอุ�
 | **ESPConnect** | REST API | 4 tools - devices, status, command, OTA |
 | **Tuya** | Cloud API (HMAC) | 5 tools - devices, status, commands, scenes |
 | **Sonoff/eWeLink** | Cloud API (v2) | 4 tools - devices, toggle, power usage |
+| **QNAP NAS** | REST API (QTS) | 8 tools - system info, volumes, disks, shared folders, apps, logs |
 
 Plus **7 cross-device tools**: list devices, status, test connection, execute command, get config, serial ports
 
@@ -43,6 +44,7 @@ src/
 │   ├── espconnect-connector.ts
 │   ├── tuya-connector.ts       # Tuya Cloud (HMAC signing)
 │   ├── sonoff-connector.ts     # eWeLink API v2
+│   ├── qnap-connector.ts      # QNAP QTS API
 │   └── index.ts                # connector factory
 └── tools/
     ├── index.ts                # 56 tool definitions + dispatcher
@@ -54,7 +56,8 @@ src/
     ├── esphome-tools.ts        # ESPHome
     ├── espconnect-tools.ts     # ESPConnect
     ├── tuya-tools.ts           # Tuya
-    └── sonoff-tools.ts         # Sonoff
+    ├── sonoff-tools.ts         # Sonoff
+    └── qnap-tools.ts          # QNAP
 ```
 
 ### Connector Pattern
@@ -71,7 +74,8 @@ BaseConnector (abstract)
 │   ├── ESPHomeConnector
 │   ├── ESPConnectConnector
 │   ├── TuyaConnector (HMAC-SHA256 signing)
-│   └── SonoffConnector (eWeLink v2)
+│   ├── SonoffConnector (eWeLink v2)
+│   └── QnapConnector (QTS API)
 └── SerialConnector (serialport)
 ```
 
@@ -229,6 +233,18 @@ npm start           # stdio mode (for Claude Desktop)
 | `sonoff_toggle` | On/off control |
 | `sonoff_get_power_usage` | Power monitoring |
 
+### QNAP NAS (`qnap_*`)
+| Tool | Description |
+|------|-------------|
+| `qnap_system_info` | System info (model, firmware, uptime) |
+| `qnap_get_volumes` | Storage volumes/pools (RAID, capacity) |
+| `qnap_get_disks` | Physical disks (SMART, health, temp) |
+| `qnap_get_shared_folders` | Shared folders |
+| `qnap_get_network` | Network interfaces |
+| `qnap_get_apps` | Running applications/packages |
+| `qnap_get_logs` | System logs |
+| `qnap_resource_usage` | CPU/memory/disk usage |
+
 ## VPN Support
 
 Container รองรับ 5 VPN protocols เพื่อเข้าถึงอุปกรณ์ที่อยู่หลัง VPN:
@@ -318,6 +334,7 @@ CF_TUNNEL_TOKEN=eyJhIjoixxxxxxx...
 | `espconnect` | `apiUrl`, optional `apiKey` |
 | `tuya` | `apiUrl`, `extra.clientId`, `extra.clientSecret` |
 | `sonoff` | `apiUrl`, `extra.appId`, `extra.appSecret`, `username`, `password` |
+| `qnap` | `apiUrl`, `username`, `password` |
 
 ### Docker Serial Port
 
