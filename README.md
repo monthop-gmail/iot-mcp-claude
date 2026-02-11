@@ -2,7 +2,7 @@
 
 MCP (Model Context Protocol) Server สำหรับจัดการอุปกรณ์ IoT และ Network ผ่าน Claude AI
 
-รองรับ **65 tools** สำหรับ **10 ประเภทอุปกรณ์** ผ่าน 3 protocols: SSH, REST API, Serial
+รองรับ **74 tools** สำหรับ **11 ประเภทอุปกรณ์** ผ่าน 3 protocols: SSH, REST API, Serial
 
 ## Supported Devices
 
@@ -18,6 +18,7 @@ MCP (Model Context Protocol) Server สำหรับจัดการอุ�
 | **Tuya** | Cloud API (HMAC) | 5 tools - devices, status, commands, scenes |
 | **Sonoff/eWeLink** | Cloud API (v2) | 4 tools - devices, toggle, power usage |
 | **QNAP NAS** | REST API (QTS) | 8 tools - system info, volumes, disks, shared folders, apps, logs |
+| **Synology NAS** | REST API (DSM) | 9 tools - system info, storage, disks, shared folders, packages, docker |
 
 Plus **7 cross-device tools**: list devices, status, test connection, execute command, get config, serial ports
 
@@ -45,6 +46,7 @@ src/
 │   ├── tuya-connector.ts       # Tuya Cloud (HMAC signing)
 │   ├── sonoff-connector.ts     # eWeLink API v2
 │   ├── qnap-connector.ts      # QNAP QTS API
+│   ├── synology-connector.ts  # Synology DSM API
 │   └── index.ts                # connector factory
 └── tools/
     ├── index.ts                # 56 tool definitions + dispatcher
@@ -57,7 +59,8 @@ src/
     ├── espconnect-tools.ts     # ESPConnect
     ├── tuya-tools.ts           # Tuya
     ├── sonoff-tools.ts         # Sonoff
-    └── qnap-tools.ts          # QNAP
+    ├── qnap-tools.ts          # QNAP
+    └── synology-tools.ts      # Synology
 ```
 
 ### Connector Pattern
@@ -75,7 +78,8 @@ BaseConnector (abstract)
 │   ├── ESPConnectConnector
 │   ├── TuyaConnector (HMAC-SHA256 signing)
 │   ├── SonoffConnector (eWeLink v2)
-│   └── QnapConnector (QTS API)
+│   ├── QnapConnector (QTS API)
+│   └── SynologyConnector (DSM API)
 └── SerialConnector (serialport)
 ```
 
@@ -245,6 +249,19 @@ npm start           # stdio mode (for Claude Desktop)
 | `qnap_get_logs` | System logs |
 | `qnap_resource_usage` | CPU/memory/disk usage |
 
+### Synology NAS (`synology_*`)
+| Tool | Description |
+|------|-------------|
+| `synology_system_info` | System info (model, DSM version, uptime) |
+| `synology_get_storage` | Storage volumes/pools (RAID, capacity) |
+| `synology_get_disks` | Physical disks (SMART, health, temp) |
+| `synology_get_shared_folders` | Shared folders |
+| `synology_get_network` | Network interfaces |
+| `synology_get_packages` | Installed packages |
+| `synology_system_utilization` | CPU/memory/network/disk utilization |
+| `synology_get_logs` | System logs |
+| `synology_get_docker` | Docker containers |
+
 ## VPN Support
 
 Container รองรับ 5 VPN protocols เพื่อเข้าถึงอุปกรณ์ที่อยู่หลัง VPN:
@@ -335,6 +352,7 @@ CF_TUNNEL_TOKEN=eyJhIjoixxxxxxx...
 | `tuya` | `apiUrl`, `extra.clientId`, `extra.clientSecret` |
 | `sonoff` | `apiUrl`, `extra.appId`, `extra.appSecret`, `username`, `password` |
 | `qnap` | `apiUrl`, `username`, `password` |
+| `synology` | `apiUrl`, `username`, `password` |
 
 ### Docker Serial Port
 

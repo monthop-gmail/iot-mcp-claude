@@ -10,6 +10,7 @@ import { ESPConnectConnector } from './espconnect-connector.js';
 import { TuyaConnector } from './tuya-connector.js';
 import { SonoffConnector } from './sonoff-connector.js';
 import { QnapConnector } from './qnap-connector.js';
+import { SynologyConnector } from './synology-connector.js';
 
 const factories: Record<DeviceType, (c: DeviceConfig) => BaseConnector> = {
   cisco:       (c) => new CiscoConnector(c),
@@ -22,6 +23,7 @@ const factories: Record<DeviceType, (c: DeviceConfig) => BaseConnector> = {
   tuya:        (c) => new TuyaConnector(c),
   sonoff:      (c) => new SonoffConnector(c),
   qnap:        (c) => new QnapConnector(c),
+  synology:    (c) => new SynologyConnector(c),
 };
 
 export function createConnector(config: DeviceConfig): BaseConnector {
@@ -44,3 +46,4 @@ export { ESPConnectConnector } from './espconnect-connector.js';
 export { TuyaConnector } from './tuya-connector.js';
 export { SonoffConnector } from './sonoff-connector.js';
 export { QnapConnector } from './qnap-connector.js';
+export { SynologyConnector } from './synology-connector.js';

@@ -9,6 +9,7 @@ import * as espconnectTools from './espconnect-tools.js';
 import * as tuyaTools from './tuya-tools.js';
 import * as sonoffTools from './sonoff-tools.js';
 import * as qnapTools from './qnap-tools.js';
+import * as synologyTools from './synology-tools.js';
 
 export const TOOLS: Tool[] = [
   // ============================================================
@@ -814,6 +815,110 @@ export const TOOLS: Tool[] = [
       required: ['device_id'],
     },
   },
+
+  // ============================================================
+  // Synology NAS Tools
+  // ============================================================
+  {
+    name: 'synology_system_info',
+    description: 'Get Synology NAS system information (model, DSM version, uptime)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Synology NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'synology_get_storage',
+    description: 'Get storage volumes/pools info from Synology NAS (RAID, capacity, usage)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Synology NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'synology_get_disks',
+    description: 'Get physical disk info from Synology NAS (SMART, health, temperature)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Synology NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'synology_get_shared_folders',
+    description: 'List shared folders on Synology NAS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Synology NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'synology_get_network',
+    description: 'Get network interface configuration from Synology NAS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Synology NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'synology_get_packages',
+    description: 'List installed packages on Synology NAS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Synology NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'synology_system_utilization',
+    description: 'Get CPU, memory, network, and disk utilization from Synology NAS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Synology NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'synology_get_logs',
+    description: 'Get system logs from Synology NAS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Synology NAS device ID' },
+        count: { type: 'number', description: 'Number of log entries (default 50)' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'synology_get_docker',
+    description: 'List Docker containers running on Synology NAS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Synology NAS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
 ];
 
 export type ToolArguments = Record<string, unknown>;
@@ -972,6 +1077,26 @@ export async function handleToolCall(
       return qnapTools.getSystemLogs(args as Parameters<typeof qnapTools.getSystemLogs>[0]);
     case 'qnap_resource_usage':
       return qnapTools.getResourceUsage(args as Parameters<typeof qnapTools.getResourceUsage>[0]);
+
+    // Synology
+    case 'synology_system_info':
+      return synologyTools.getSystemInfo(args as Parameters<typeof synologyTools.getSystemInfo>[0]);
+    case 'synology_get_storage':
+      return synologyTools.getStorageInfo(args as Parameters<typeof synologyTools.getStorageInfo>[0]);
+    case 'synology_get_disks':
+      return synologyTools.getDisks(args as Parameters<typeof synologyTools.getDisks>[0]);
+    case 'synology_get_shared_folders':
+      return synologyTools.getSharedFolders(args as Parameters<typeof synologyTools.getSharedFolders>[0]);
+    case 'synology_get_network':
+      return synologyTools.getNetworkInterfaces(args as Parameters<typeof synologyTools.getNetworkInterfaces>[0]);
+    case 'synology_get_packages':
+      return synologyTools.getInstalledPackages(args as Parameters<typeof synologyTools.getInstalledPackages>[0]);
+    case 'synology_system_utilization':
+      return synologyTools.getSystemUtilization(args as Parameters<typeof synologyTools.getSystemUtilization>[0]);
+    case 'synology_get_logs':
+      return synologyTools.getSystemLogs(args as Parameters<typeof synologyTools.getSystemLogs>[0]);
+    case 'synology_get_docker':
+      return synologyTools.getDockerContainers(args as Parameters<typeof synologyTools.getDockerContainers>[0]);
 
     default:
       throw new Error(`Unknown tool: ${name}`);

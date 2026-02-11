@@ -112,6 +112,16 @@
       "username": "admin",
       "password": "${QNAP_PASSWORD}",
       "tags": ["storage", "nas"]
+    },
+    {
+      "id": "synology-nas",
+      "name": "Synology NAS",
+      "type": "synology",
+      "transport": ["rest"],
+      "apiUrl": "https://192.168.1.201:5001",
+      "username": "admin",
+      "password": "${SYNOLOGY_PASSWORD}",
+      "tags": ["storage", "nas"]
     }
   ]
 }

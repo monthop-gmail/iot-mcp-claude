@@ -10,7 +10,8 @@ export type DeviceType =
   | 'espconnect'
   | 'tuya'
   | 'sonoff'
-  | 'qnap';
+  | 'qnap'
+  | 'synology';
 
 export type ConnectionStatus = 'connected' | 'disconnected' | 'error' | 'unknown';
 
