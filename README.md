@@ -229,6 +229,59 @@ npm start           # stdio mode (for Claude Desktop)
 | `sonoff_toggle` | On/off control |
 | `sonoff_get_power_usage` | Power monitoring |
 
+## VPN Support
+
+Container รองรับ 3 VPN protocols เพื่อเข้าถึงอุปกรณ์ที่อยู่หลัง VPN:
+
+| VPN | Config Location | Auto-connect |
+|-----|----------------|--------------|
+| **OpenVPN** | `vpn/openvpn/*.ovpn` | ทุก .ovpn file |
+| **WireGuard** | `vpn/wireguard/*.conf` | ทุก .conf file |
+| **Tailscale** | `TS_AUTHKEY` in `.env` | เมื่อมี authkey |
+
+### Setup OpenVPN
+
+วาง `.ovpn` config files ไว้ใน `vpn/openvpn/`:
+
+```bash
+cp your-vpn-config.ovpn vpn/openvpn/
+```
+
+### Setup WireGuard
+
+วาง WireGuard config ไว้ใน `vpn/wireguard/`:
+
+```bash
+cp wg0.conf vpn/wireguard/
+```
+
+### Setup Tailscale
+
+สร้าง auth key จาก https://login.tailscale.com/admin/settings/keys แล้วใส่ใน `.env`:
+
+```
+TS_AUTHKEY=tskey-auth-xxxxxxxxxxxxx
+```
+
+### Device VPN Annotation
+
+ระบุ VPN ที่อุปกรณ์ใช้ใน `devices.json` ด้วย field `vpn` (optional, ช่วยให้ Claude รู้ว่าอุปกรณ์อยู่หลัง VPN ไหน):
+
+```json
+{
+  "id": "cisco-remote",
+  "name": "Cisco Remote Switch",
+  "type": "cisco",
+  "host": "10.8.0.100",
+  "vpn": "openvpn",
+  "tags": ["remote"]
+}
+```
+
+### Check VPN Status
+
+ใช้ tool `vpn_status` เพื่อดูสถานะ VPN interfaces ทั้งหมด
+
 ## Configuration
 
 ### Device Types
@@ -261,6 +314,7 @@ devices:
 | `SSE_PORT` | `3000` | SSE server port (internal) |
 | `DEVICES_FILE` | `./devices.json` | Path to device inventory |
 | `NODE_TLS_REJECT_UNAUTHORIZED` | - | Set to `0` for self-signed certs |
+| `TS_AUTHKEY` | - | Tailscale auth key (auto-connect) |
 
 ## Tech Stack
 
@@ -271,3 +325,4 @@ devices:
 - **Serial**: serialport (native bindings)
 - **HTTP**: Native fetch (Node 22 built-in)
 - **Docker**: node:22-slim multi-stage build
+- **VPN**: OpenVPN, WireGuard, Tailscale (built into container)

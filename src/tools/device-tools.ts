@@ -1,3 +1,4 @@
+import { execSync } from 'child_process';
 import { getRegistry } from '../device-registry.js';
 import { DeviceType } from '../types.js';
 import { SerialConnector } from '../connectors/serial-connector.js';
@@ -28,6 +29,7 @@ export async function listDevices(args: {
       type: d.type,
       transport: d.transport,
       host: d.host,
+      vpn: d.vpn,
       tags: d.tags,
     })),
   };
@@ -80,4 +82,73 @@ export async function getConfig(args: { device_id: string; section?: string }) {
 export async function listSerialPorts() {
   const ports = await SerialConnector.listPorts();
   return { ports };
+}
+
+export async function vpnStatus() {
+  const result: {
+    openvpn: Array<{ name: string; status: string; ip?: string }>;
+    wireguard: Array<{ name: string; status: string; peers?: number }>;
+    tailscale: { status: string; ip?: string; hostname?: string };
+    interfaces: string;
+  } = {
+    openvpn: [],
+    wireguard: [],
+    tailscale: { status: 'not running' },
+    interfaces: '',
+  };
+
+  // Check OpenVPN tunnels
+  try {
+    const tuns = execSync('ip -o link show type tun 2>/dev/null || true', { encoding: 'utf-8' }).trim();
+    if (tuns) {
+      for (const line of tuns.split('\n')) {
+        const match = line.match(/\d+:\s+(\S+?)[@:]/);
+        if (match) {
+          const name = match[1];
+          let ip: string | undefined;
+          try {
+            const addrOut = execSync(`ip -4 addr show ${name} 2>/dev/null`, { encoding: 'utf-8' });
+            const ipMatch = addrOut.match(/inet\s+([\d.]+)/);
+            ip = ipMatch?.[1];
+          } catch { /* ignore */ }
+          result.openvpn.push({ name, status: 'up', ip });
+        }
+      }
+    }
+  } catch { /* ignore */ }
+
+  // Check WireGuard interfaces
+  try {
+    const wgOut = execSync('wg show 2>/dev/null || true', { encoding: 'utf-8' }).trim();
+    if (wgOut) {
+      const ifaces = wgOut.split(/(?=interface:)/);
+      for (const iface of ifaces) {
+        const nameMatch = iface.match(/interface:\s+(\S+)/);
+        if (nameMatch) {
+          const peers = (iface.match(/peer:/g) || []).length;
+          result.wireguard.push({ name: nameMatch[1], status: 'up', peers });
+        }
+      }
+    }
+  } catch { /* ignore */ }
+
+  // Check Tailscale
+  try {
+    const tsOut = execSync('tailscale status --json 2>/dev/null || true', { encoding: 'utf-8' }).trim();
+    if (tsOut && tsOut.startsWith('{')) {
+      const ts = JSON.parse(tsOut);
+      result.tailscale = {
+        status: ts.BackendState || 'unknown',
+        ip: ts.TailscaleIPs?.[0],
+        hostname: ts.Self?.HostName,
+      };
+    }
+  } catch { /* ignore */ }
+
+  // All network interfaces summary
+  try {
+    result.interfaces = execSync('ip -brief addr show 2>/dev/null || true', { encoding: 'utf-8' }).trim();
+  } catch { /* ignore */ }
+
+  return result;
 }

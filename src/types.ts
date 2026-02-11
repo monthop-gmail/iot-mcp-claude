@@ -27,6 +27,7 @@ export interface DeviceConfig {
   serialPort?: string;
   serialBaud?: number;
   enablePassword?: string;
+  vpn?: string;
   tags?: string[];
   extra?: Record<string, unknown>;
 }

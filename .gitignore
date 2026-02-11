@@ -3,3 +3,10 @@ dist/
 .env
 devices.json
 *.log
+
+# VPN configs (contain secrets)
+vpn/openvpn/*.ovpn
+vpn/openvpn/*.conf
+vpn/openvpn/*.key
+vpn/openvpn/*.crt
+vpn/wireguard/*.conf

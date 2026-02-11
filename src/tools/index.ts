@@ -90,6 +90,14 @@ export const TOOLS: Tool[] = [
       properties: {},
     },
   },
+  {
+    name: 'vpn_status',
+    description: 'Check status of all VPN connections (OpenVPN tunnels, WireGuard interfaces, Tailscale)',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+  },
 
   // ============================================================
   // Network Switch Tools (Cisco + HP)
@@ -736,6 +744,8 @@ export async function handleToolCall(
       return deviceTools.getConfig(args as Parameters<typeof deviceTools.getConfig>[0]);
     case 'iot_serial_list_ports':
       return deviceTools.listSerialPorts();
+    case 'vpn_status':
+      return deviceTools.vpnStatus();
 
     // Network Switch
     case 'switch_show_interfaces':

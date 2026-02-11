@@ -10,6 +10,7 @@
       "username": "admin",
       "password": "${CISCO_CORE_PASSWORD}",
       "enablePassword": "${CISCO_CORE_ENABLE}",
+      "vpn": "openvpn",
       "tags": ["core", "network", "switch"]
     },
     {
@@ -21,6 +22,7 @@
       "port": 22,
       "username": "manager",
       "password": "${HP_FLOOR2_PASSWORD}",
+      "vpn": "wireguard",
       "tags": ["access", "network", "switch"]
     },
     {
@@ -65,6 +67,7 @@
       "transport": ["rest"],
       "apiUrl": "http://192.168.1.50:6052",
       "apiKey": "${ESPHOME_API_KEY}",
+      "vpn": "tailscale",
       "tags": ["iot", "esphome"]
     },
     {
