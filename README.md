@@ -57,7 +57,7 @@ src/
 │   ├── dahua-dss-connector.ts # Dahua DSS Pro/Express REST API
 │   └── index.ts                # connector factory
 └── tools/
-    ├── index.ts                # 56 tool definitions + dispatcher
+    ├── index.ts                # 114 tool definitions + dispatcher
     ├── device-tools.ts         # cross-device operations
     ├── network-switch-tools.ts # Cisco + HP
     ├── firewall-tools.ts       # Fortigate
@@ -171,6 +171,7 @@ npm start           # stdio mode (for Claude Desktop)
 | `iot_execute_command` | Execute CLI command on SSH device |
 | `iot_get_config` | Retrieve running config |
 | `iot_serial_list_ports` | List available serial ports |
+| `vpn_status` | Check all VPN connections status |
 
 ### Network Switch (`switch_*`)
 | Tool | Description |
@@ -309,6 +310,31 @@ npm start           # stdio mode (for Claude Desktop)
 | `esxi_delete_snapshot` | Delete VM snapshot |
 | `esxi_revert_snapshot` | Revert VM to snapshot |
 
+### Dahua NVR/DVR/IPC (`dahua_nvr_*`)
+| Tool | Description |
+|------|-------------|
+| `dahua_nvr_system_info` | System info (model, firmware, serial number) |
+| `dahua_nvr_get_channels` | Camera channels list |
+| `dahua_nvr_channel_status` | Video input status |
+| `dahua_nvr_storage_info` | HDD/storage info |
+| `dahua_nvr_network` | Network configuration |
+| `dahua_nvr_alarms` | Alarm/event history |
+| `dahua_nvr_recording_status` | Recording mode/status |
+| `dahua_nvr_ptz` | PTZ camera control (pan, tilt, zoom, preset) |
+
+### Dahua DSS Pro/Express (`dss_*`)
+| Tool | Description |
+|------|-------------|
+| `dss_server_info` | DSS server information |
+| `dss_list_devices` | List managed devices |
+| `dss_device_info` | Device details by code |
+| `dss_list_channels` | Video channels (all or by device) |
+| `dss_channel_status` | Channel online/offline status |
+| `dss_list_alarms` | Alarm events (with time filter) |
+| `dss_list_organizations` | Organization groups |
+| `dss_record_status` | Channel recording status |
+| `dss_device_online_status` | Device online/offline check |
+
 ## VPN Support
 
 Container รองรับ 5 VPN protocols เพื่อเข้าถึงอุปกรณ์ที่อยู่หลัง VPN:
@@ -402,6 +428,8 @@ CF_TUNNEL_TOKEN=eyJhIjoixxxxxxx...
 | `synology` | `apiUrl`, `username`, `password` |
 | `proxmox` | `apiUrl`, `username`, `password` (or `apiKey` for API token) |
 | `esxi` | `host`, `username`, `password` (vSphere REST API, ESXi 6.5+) |
+| `dahua-nvr` | `apiUrl`, `username`, `password` (HTTP CGI API, Basic auth) |
+| `dahua-dss` | `apiUrl`, `username`, `password` (REST API, token auth) |
 
 ### Docker Serial Port
 
