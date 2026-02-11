@@ -176,6 +176,21 @@
         "domain": "Default"
       },
       "tags": ["cloud", "hypervisor", "openstack"]
+    },
+    {
+      "id": "hf-serial-01",
+      "name": "HF5111 Serial Server",
+      "type": "hiflying",
+      "transport": ["rest"],
+      "host": "192.168.1.50",
+      "apiUrl": "http://192.168.1.50",
+      "username": "admin",
+      "password": "${HF_PASSWORD}",
+      "extra": {
+        "atPort": 49000,
+        "serialPort": 8899
+      },
+      "tags": ["iot", "serial", "gateway"]
     }
   ]
 }

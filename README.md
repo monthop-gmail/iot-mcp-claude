@@ -2,7 +2,7 @@
 
 MCP (Model Context Protocol) Server สำหรับจัดการอุปกรณ์ IoT และ Network ผ่าน Claude AI
 
-รองรับ **126 tools** สำหรับ **16 ประเภทอุปกรณ์** ผ่าน 3 protocols: SSH, REST API, Serial
+รองรับ **135 tools** สำหรับ **17 ประเภทอุปกรณ์** ผ่าน 3 protocols: SSH, REST API, Serial
 
 ## Supported Devices
 
@@ -24,6 +24,7 @@ MCP (Model Context Protocol) Server สำหรับจัดการอุ�
 | **Dahua NVR/DVR** | HTTP CGI API | 8 tools - system info, channels, storage, alarms, recording, PTZ |
 | **Dahua DSS** | REST API (token) | 9 tools - server info, devices, channels, alarms, organizations |
 | **OpenStack/MicroStack** | REST API (Keystone v3) | 12 tools - servers, flavors, hypervisors, images, networks, volumes |
+| **Hi-Flying Serial Server** | AT Commands (TCP) | 9 tools - device info, serial config, network, WiFi, AT command, serial data |
 
 Plus **8 cross-device tools**: list devices, status, test connection, execute command, get config, serial ports, VPN status
 
@@ -57,9 +58,10 @@ src/
 │   ├── dahua-nvr-connector.ts # Dahua NVR/DVR/IPC CGI API
 │   ├── dahua-dss-connector.ts # Dahua DSS Pro/Express REST API
 │   ├── openstack-connector.ts # OpenStack/MicroStack (Keystone v3)
+│   ├── hiflying-connector.ts  # Hi-Flying Serial Server (AT+TCP)
 │   └── index.ts                # connector factory
 └── tools/
-    ├── index.ts                # 126 tool definitions + dispatcher
+    ├── index.ts                # 135 tool definitions + dispatcher
     ├── device-tools.ts         # cross-device operations
     ├── network-switch-tools.ts # Cisco + HP
     ├── firewall-tools.ts       # Fortigate
@@ -75,7 +77,8 @@ src/
     ├── esxi-tools.ts          # ESXi
     ├── dahua-nvr-tools.ts     # Dahua NVR
     ├── dahua-dss-tools.ts     # Dahua DSS
-    └── openstack-tools.ts     # OpenStack
+    ├── openstack-tools.ts     # OpenStack
+    └── hiflying-tools.ts      # Hi-Flying
 ```
 
 ### Connector Pattern
@@ -99,7 +102,8 @@ BaseConnector (abstract)
 │   ├── ESXiConnector (vSphere REST API)
 │   ├── DahuaNvrConnector (HTTP CGI, Basic auth)
 │   ├── DahuaDssConnector (REST API, token auth)
-│   └── OpenStackConnector (Keystone v3 + Nova/Neutron/Cinder/Glance)
+│   ├── OpenStackConnector (Keystone v3 + Nova/Neutron/Cinder/Glance)
+│   └── HiFlyingConnector (AT commands + TCP transparent)
 └── SerialConnector (serialport)
 ```
 
@@ -355,6 +359,19 @@ npm start           # stdio mode (for Claude Desktop)
 | `openstack_list_volumes` | Block storage volumes (Cinder) |
 | `openstack_list_projects` | Projects/tenants (Keystone) |
 
+### Hi-Flying Serial Server (`hf_*`)
+| Tool | Description |
+|------|-------------|
+| `hf_device_info` | Device info (firmware, MAC address) |
+| `hf_get_serial_config` | Serial port settings (baud, parity) |
+| `hf_set_serial_config` | Change serial port parameters |
+| `hf_get_network` | Network config (IP, gateway, TCP port) |
+| `hf_get_wifi` | WiFi SSID and security (WiFi models) |
+| `hf_tcp_status` | TCP link status |
+| `hf_at_command` | Send raw AT command |
+| `hf_serial_send` | Send data through serial port (TCP transparent) |
+| `hf_reboot` | Reboot device |
+
 ## VPN Support
 
 Container รองรับ 5 VPN protocols เพื่อเข้าถึงอุปกรณ์ที่อยู่หลัง VPN:
@@ -451,6 +468,7 @@ CF_TUNNEL_TOKEN=eyJhIjoixxxxxxx...
 | `dahua-nvr` | `apiUrl`, `username`, `password` (HTTP CGI API, Basic auth) |
 | `dahua-dss` | `apiUrl`, `username`, `password` (REST API, token auth) |
 | `openstack` | `apiUrl` (Keystone), `username`, `password`, `extra.project`, `extra.domain` |
+| `hiflying` | `host`, `apiUrl`, `username`, `password`, `extra.atPort` (49000), `extra.serialPort` (8899) |
 
 ### Docker Serial Port
 

@@ -16,7 +16,8 @@ export type DeviceType =
   | 'esxi'
   | 'dahua-nvr'
   | 'dahua-dss'
-  | 'openstack';
+  | 'openstack'
+  | 'hiflying';
 
 export type ConnectionStatus = 'connected' | 'disconnected' | 'error' | 'unknown';
 

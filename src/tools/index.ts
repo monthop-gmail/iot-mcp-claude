@@ -15,6 +15,7 @@ import * as esxiTools from './esxi-tools.js';
 import * as dahuaNvrTools from './dahua-nvr-tools.js';
 import * as dahuaDssTools from './dahua-dss-tools.js';
 import * as openstackTools from './openstack-tools.js';
+import * as hiflyingTools from './hiflying-tools.js';
 
 export const TOOLS: Tool[] = [
   // ============================================================
@@ -1576,6 +1577,119 @@ export const TOOLS: Tool[] = [
       required: ['device_id'],
     },
   },
+
+  // ============================================================
+  // Hi-Flying Serial Server Tools (HF5111, HF2211, Elfin-EE/EW)
+  // ============================================================
+  {
+    name: 'hf_device_info',
+    description: 'Get Hi-Flying serial server info (firmware, MAC address)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Hi-Flying device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'hf_get_serial_config',
+    description: 'Get serial port configuration from Hi-Flying device (baud rate, data bits, parity)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Hi-Flying device ID' },
+        port: { type: 'number', description: 'Serial port number (for multi-port models, optional)' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'hf_set_serial_config',
+    description: 'Set serial port parameters on Hi-Flying device',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Hi-Flying device ID' },
+        baud: { type: 'number', description: 'Baud rate (e.g. 9600, 115200)' },
+        data_bits: { type: 'number', description: 'Data bits: 7 or 8 (default 8)' },
+        stop_bits: { type: 'number', description: 'Stop bits: 1 or 2 (default 1)' },
+        parity: { type: 'string', description: 'Parity: NONE, ODD, EVEN (default NONE)' },
+        port: { type: 'number', description: 'Serial port number (for multi-port models, optional)' },
+      },
+      required: ['device_id', 'baud'],
+    },
+  },
+  {
+    name: 'hf_get_network',
+    description: 'Get network configuration from Hi-Flying device (IP, gateway, TCP port)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Hi-Flying device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'hf_get_wifi',
+    description: 'Get WiFi configuration from Hi-Flying device (SSID, security, mode)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Hi-Flying WiFi device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'hf_tcp_status',
+    description: 'Check TCP link status of Hi-Flying serial server',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Hi-Flying device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'hf_at_command',
+    description: 'Send raw AT command to Hi-Flying device',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Hi-Flying device ID' },
+        command: { type: 'string', description: 'AT command (e.g. "AT+VER", "AT+UART")' },
+        timeout: { type: 'number', description: 'Response timeout in ms (default 3000)' },
+      },
+      required: ['device_id', 'command'],
+    },
+  },
+  {
+    name: 'hf_serial_send',
+    description: 'Send data through serial port via Hi-Flying TCP transparent mode. Supports hex string (space-separated) or text.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Hi-Flying device ID' },
+        data: { type: 'string', description: 'Data to send (hex: "01 03 00 00 00 01 84 0A" or text)' },
+        timeout: { type: 'number', description: 'Response timeout in ms (default 3000)' },
+      },
+      required: ['device_id', 'data'],
+    },
+  },
+  {
+    name: 'hf_reboot',
+    description: 'Reboot Hi-Flying serial server',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Hi-Flying device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
 ];
 
 export type ToolArguments = Record<string, unknown>;
@@ -1868,6 +1982,26 @@ export async function handleToolCall(
       return openstackTools.listVolumes(args as Parameters<typeof openstackTools.listVolumes>[0]);
     case 'openstack_list_projects':
       return openstackTools.listProjects(args as Parameters<typeof openstackTools.listProjects>[0]);
+
+    // Hi-Flying
+    case 'hf_device_info':
+      return hiflyingTools.getDeviceInfo(args as Parameters<typeof hiflyingTools.getDeviceInfo>[0]);
+    case 'hf_get_serial_config':
+      return hiflyingTools.getSerialConfig(args as Parameters<typeof hiflyingTools.getSerialConfig>[0]);
+    case 'hf_set_serial_config':
+      return hiflyingTools.setSerialConfig(args as Parameters<typeof hiflyingTools.setSerialConfig>[0]);
+    case 'hf_get_network':
+      return hiflyingTools.getNetworkConfig(args as Parameters<typeof hiflyingTools.getNetworkConfig>[0]);
+    case 'hf_get_wifi':
+      return hiflyingTools.getWifiConfig(args as Parameters<typeof hiflyingTools.getWifiConfig>[0]);
+    case 'hf_tcp_status':
+      return hiflyingTools.getTcpStatus(args as Parameters<typeof hiflyingTools.getTcpStatus>[0]);
+    case 'hf_at_command':
+      return hiflyingTools.atCommand(args as Parameters<typeof hiflyingTools.atCommand>[0]);
+    case 'hf_serial_send':
+      return hiflyingTools.serialSend(args as Parameters<typeof hiflyingTools.serialSend>[0]);
+    case 'hf_reboot':
+      return hiflyingTools.reboot(args as Parameters<typeof hiflyingTools.reboot>[0]);
 
     default:
       throw new Error(`Unknown tool: ${name}`);

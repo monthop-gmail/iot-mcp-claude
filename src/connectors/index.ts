@@ -16,6 +16,7 @@ import { ESXiConnector } from './esxi-connector.js';
 import { DahuaNvrConnector } from './dahua-nvr-connector.js';
 import { DahuaDssConnector } from './dahua-dss-connector.js';
 import { OpenStackConnector } from './openstack-connector.js';
+import { HiFlyingConnector } from './hiflying-connector.js';
 
 const factories: Record<DeviceType, (c: DeviceConfig) => BaseConnector> = {
   cisco:       (c) => new CiscoConnector(c),
@@ -34,6 +35,7 @@ const factories: Record<DeviceType, (c: DeviceConfig) => BaseConnector> = {
   'dahua-nvr':  (c) => new DahuaNvrConnector(c),
   'dahua-dss':  (c) => new DahuaDssConnector(c),
   openstack:    (c) => new OpenStackConnector(c),
+  hiflying:     (c) => new HiFlyingConnector(c),
 };
 
 export function createConnector(config: DeviceConfig): BaseConnector {
@@ -62,3 +64,4 @@ export { ESXiConnector } from './esxi-connector.js';
 export { DahuaNvrConnector } from './dahua-nvr-connector.js';
 export { DahuaDssConnector } from './dahua-dss-connector.js';
 export { OpenStackConnector } from './openstack-connector.js';
+export { HiFlyingConnector } from './hiflying-connector.js';
