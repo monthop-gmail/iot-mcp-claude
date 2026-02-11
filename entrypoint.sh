@@ -45,6 +45,22 @@ if [ -n "$TS_AUTHKEY" ]; then
   tailscale status 2>/dev/null | head -10 || echo "  (not connected)"
 fi
 
+# -------------------------------------------------------
+# Cloudflare Tunnel: start if CF_TUNNEL_TOKEN is set
+# -------------------------------------------------------
+if [ -n "$CF_TUNNEL_TOKEN" ]; then
+  echo "[VPN] Starting Cloudflare Tunnel..."
+  cloudflared tunnel --no-autoupdate run --token "$CF_TUNNEL_TOKEN" \
+    > /tmp/cloudflared.log 2>&1 &
+  sleep 3
+  echo "[VPN] Cloudflare Tunnel status:"
+  if pgrep -x cloudflared > /dev/null; then
+    echo "  cloudflared running (PID $(pgrep -x cloudflared))"
+  else
+    echo "  Warning: cloudflared not running, check /tmp/cloudflared.log"
+  fi
+fi
+
 echo "=== VPN setup complete ==="
 echo ""
 
@@ -66,6 +82,8 @@ cleanup() {
     tailscale down 2>/dev/null || true
     kill $(cat /var/run/tailscale/tailscaled.pid 2>/dev/null) 2>/dev/null || true
   fi
+  # Stop Cloudflare Tunnel
+  killall cloudflared 2>/dev/null || true
   # Stop OpenVPN
   killall openvpn 2>/dev/null || true
   exit 0

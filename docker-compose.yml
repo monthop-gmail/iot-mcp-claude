@@ -32,6 +32,7 @@ services:
       - NODE_TLS_REJECT_UNAUTHORIZED=0
       # Tailscale (set TS_AUTHKEY in .env to enable)
       # - TS_EXTRA_ARGS=--advertise-tags=tag:server
+      # Cloudflare Tunnel (set CF_TUNNEL_TOKEN in .env to enable)
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
       interval: 30s

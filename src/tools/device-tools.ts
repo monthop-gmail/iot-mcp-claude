@@ -89,11 +89,13 @@ export async function vpnStatus() {
     openvpn: Array<{ name: string; status: string; ip?: string }>;
     wireguard: Array<{ name: string; status: string; peers?: number }>;
     tailscale: { status: string; ip?: string; hostname?: string };
+    cloudflare: { status: string; pid?: number; connector_id?: string };
     interfaces: string;
   } = {
     openvpn: [],
     wireguard: [],
     tailscale: { status: 'not running' },
+    cloudflare: { status: 'not running' },
     interfaces: '',
   };
 
@@ -142,6 +144,27 @@ export async function vpnStatus() {
         ip: ts.TailscaleIPs?.[0],
         hostname: ts.Self?.HostName,
       };
+    }
+  } catch { /* ignore */ }
+
+  // Check Cloudflare Tunnel
+  try {
+    const cfPid = execSync('pgrep -x cloudflared 2>/dev/null || true', { encoding: 'utf-8' }).trim();
+    if (cfPid) {
+      result.cloudflare = { status: 'running', pid: parseInt(cfPid.split('\n')[0]) };
+      try {
+        const cfMetrics = execSync('curl -s http://localhost:33400/ready 2>/dev/null || true', { encoding: 'utf-8' }).trim();
+        if (cfMetrics.includes('200') || cfMetrics.length > 0) {
+          result.cloudflare.status = 'connected';
+        }
+      } catch { /* ignore */ }
+      try {
+        const cfLog = execSync('tail -5 /tmp/cloudflared.log 2>/dev/null || true', { encoding: 'utf-8' }).trim();
+        const connMatch = cfLog.match(/Registered tunnel connection\s+connIndex=\d+\s+connection=([a-f0-9-]+)/);
+        if (connMatch) {
+          result.cloudflare.connector_id = connMatch[1];
+        }
+      } catch { /* ignore */ }
     }
   } catch { /* ignore */ }
 

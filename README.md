@@ -231,13 +231,14 @@ npm start           # stdio mode (for Claude Desktop)
 
 ## VPN Support
 
-Container รองรับ 3 VPN protocols เพื่อเข้าถึงอุปกรณ์ที่อยู่หลัง VPN:
+Container รองรับ 4 VPN protocols เพื่อเข้าถึงอุปกรณ์ที่อยู่หลัง VPN:
 
 | VPN | Config Location | Auto-connect |
 |-----|----------------|--------------|
 | **OpenVPN** | `vpn/openvpn/*.ovpn` | ทุก .ovpn file |
 | **WireGuard** | `vpn/wireguard/*.conf` | ทุก .conf file |
 | **Tailscale** | `TS_AUTHKEY` in `.env` | เมื่อมี authkey |
+| **Cloudflare Tunnel** | `CF_TUNNEL_TOKEN` in `.env` | เมื่อมี token |
 
 ### Setup OpenVPN
 
@@ -262,6 +263,16 @@ cp wg0.conf vpn/wireguard/
 ```
 TS_AUTHKEY=tskey-auth-xxxxxxxxxxxxx
 ```
+
+### Setup Cloudflare Tunnel
+
+สร้าง Tunnel จาก [Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com/) -> Networks -> Tunnels แล้วคัดลอก token ใส่ `.env`:
+
+```
+CF_TUNNEL_TOKEN=eyJhIjoixxxxxxx...
+```
+
+กำหนด Private Network routes ใน Cloudflare Dashboard เพื่อให้ tunnel route traffic ไปยัง subnet ของอุปกรณ์
 
 ### Device VPN Annotation
 
@@ -315,6 +326,7 @@ devices:
 | `DEVICES_FILE` | `./devices.json` | Path to device inventory |
 | `NODE_TLS_REJECT_UNAUTHORIZED` | - | Set to `0` for self-signed certs |
 | `TS_AUTHKEY` | - | Tailscale auth key (auto-connect) |
+| `CF_TUNNEL_TOKEN` | - | Cloudflare Tunnel token (auto-connect) |
 
 ## Tech Stack
 
@@ -325,4 +337,4 @@ devices:
 - **Serial**: serialport (native bindings)
 - **HTTP**: Native fetch (Node 22 built-in)
 - **Docker**: node:22-slim multi-stage build
-- **VPN**: OpenVPN, WireGuard, Tailscale (built into container)
+- **VPN**: OpenVPN, WireGuard, Tailscale, Cloudflare Tunnel (built into container)

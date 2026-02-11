@@ -39,6 +39,14 @@ RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg \
     && apt-get update && apt-get install -y --no-install-recommends tailscale \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Cloudflare Tunnel (cloudflared)
+RUN curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg \
+      -o /usr/share/keyrings/cloudflare-main.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared bookworm main" \
+      > /etc/apt/sources.list.d/cloudflared.list \
+    && apt-get update && apt-get install -y --no-install-recommends cloudflared \
+    && rm -rf /var/lib/apt/lists/*
+
 # Create directories for VPN state
 RUN mkdir -p /var/lib/tailscale /var/run/tailscale /etc/openvpn/client /etc/wireguard
 
