@@ -142,6 +142,26 @@
       "username": "root",
       "password": "${ESXI_PASSWORD}",
       "tags": ["hypervisor", "server"]
+    },
+    {
+      "id": "dahua-nvr-01",
+      "name": "Dahua NVR",
+      "type": "dahua-nvr",
+      "transport": ["rest"],
+      "apiUrl": "http://192.168.1.108",
+      "username": "admin",
+      "password": "${DAHUA_NVR_PASSWORD}",
+      "tags": ["cctv", "nvr", "surveillance"]
+    },
+    {
+      "id": "dahua-dss-01",
+      "name": "Dahua DSS Pro",
+      "type": "dahua-dss",
+      "transport": ["rest"],
+      "apiUrl": "https://192.168.1.109:443",
+      "username": "system",
+      "password": "${DAHUA_DSS_PASSWORD}",
+      "tags": ["cctv", "vms", "surveillance"]
     }
   ]
 }

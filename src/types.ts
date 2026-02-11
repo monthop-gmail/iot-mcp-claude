@@ -13,7 +13,9 @@ export type DeviceType =
   | 'qnap'
   | 'synology'
   | 'proxmox'
-  | 'esxi';
+  | 'esxi'
+  | 'dahua-nvr'
+  | 'dahua-dss';
 
 export type ConnectionStatus = 'connected' | 'disconnected' | 'error' | 'unknown';
 

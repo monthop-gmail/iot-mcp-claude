@@ -2,7 +2,7 @@
 
 MCP (Model Context Protocol) Server สำหรับจัดการอุปกรณ์ IoT และ Network ผ่าน Claude AI
 
-รองรับ **97 tools** สำหรับ **13 ประเภทอุปกรณ์** ผ่าน 3 protocols: SSH, REST API, Serial
+รองรับ **114 tools** สำหรับ **15 ประเภทอุปกรณ์** ผ่าน 3 protocols: SSH, REST API, Serial
 
 ## Supported Devices
 
@@ -21,8 +21,10 @@ MCP (Model Context Protocol) Server สำหรับจัดการอุ�
 | **Synology NAS** | REST API (DSM) | 9 tools - system info, storage, disks, shared folders, packages, docker |
 | **Proxmox VE** | REST API (PVE) | 10 tools - nodes, VMs, LXC containers, storage, cluster resources |
 | **VMware ESXi** | REST API (vSphere) | 13 tools - VMs, power, snapshots, host, datastores, networks |
+| **Dahua NVR/DVR** | HTTP CGI API | 8 tools - system info, channels, storage, alarms, recording, PTZ |
+| **Dahua DSS** | REST API (token) | 9 tools - server info, devices, channels, alarms, organizations |
 
-Plus **7 cross-device tools**: list devices, status, test connection, execute command, get config, serial ports
+Plus **8 cross-device tools**: list devices, status, test connection, execute command, get config, serial ports, VPN status
 
 ## Architecture
 
@@ -51,6 +53,8 @@ src/
 │   ├── synology-connector.ts  # Synology DSM API
 │   ├── proxmox-connector.ts   # Proxmox VE API
 │   ├── esxi-connector.ts     # VMware vSphere REST API
+│   ├── dahua-nvr-connector.ts # Dahua NVR/DVR/IPC CGI API
+│   ├── dahua-dss-connector.ts # Dahua DSS Pro/Express REST API
 │   └── index.ts                # connector factory
 └── tools/
     ├── index.ts                # 56 tool definitions + dispatcher
@@ -66,7 +70,9 @@ src/
     ├── qnap-tools.ts          # QNAP
     ├── synology-tools.ts      # Synology
     ├── proxmox-tools.ts       # Proxmox
-    └── esxi-tools.ts          # ESXi
+    ├── esxi-tools.ts          # ESXi
+    ├── dahua-nvr-tools.ts     # Dahua NVR
+    └── dahua-dss-tools.ts     # Dahua DSS
 ```
 
 ### Connector Pattern
@@ -87,7 +93,9 @@ BaseConnector (abstract)
 │   ├── QnapConnector (QTS API)
 │   ├── SynologyConnector (DSM API)
 │   ├── ProxmoxConnector (PVE API)
-│   └── ESXiConnector (vSphere REST API)
+│   ├── ESXiConnector (vSphere REST API)
+│   ├── DahuaNvrConnector (HTTP CGI, Basic auth)
+│   └── DahuaDssConnector (REST API, token auth)
 └── SerialConnector (serialport)
 ```
 

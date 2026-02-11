@@ -13,6 +13,8 @@ import { QnapConnector } from './qnap-connector.js';
 import { SynologyConnector } from './synology-connector.js';
 import { ProxmoxConnector } from './proxmox-connector.js';
 import { ESXiConnector } from './esxi-connector.js';
+import { DahuaNvrConnector } from './dahua-nvr-connector.js';
+import { DahuaDssConnector } from './dahua-dss-connector.js';
 
 const factories: Record<DeviceType, (c: DeviceConfig) => BaseConnector> = {
   cisco:       (c) => new CiscoConnector(c),
@@ -28,6 +30,8 @@ const factories: Record<DeviceType, (c: DeviceConfig) => BaseConnector> = {
   synology:    (c) => new SynologyConnector(c),
   proxmox:     (c) => new ProxmoxConnector(c),
   esxi:        (c) => new ESXiConnector(c),
+  'dahua-nvr':  (c) => new DahuaNvrConnector(c),
+  'dahua-dss':  (c) => new DahuaDssConnector(c),
 };
 
 export function createConnector(config: DeviceConfig): BaseConnector {
@@ -53,3 +57,5 @@ export { QnapConnector } from './qnap-connector.js';
 export { SynologyConnector } from './synology-connector.js';
 export { ProxmoxConnector } from './proxmox-connector.js';
 export { ESXiConnector } from './esxi-connector.js';
+export { DahuaNvrConnector } from './dahua-nvr-connector.js';
+export { DahuaDssConnector } from './dahua-dss-connector.js';

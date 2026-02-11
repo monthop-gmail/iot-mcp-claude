@@ -12,6 +12,8 @@ import * as qnapTools from './qnap-tools.js';
 import * as synologyTools from './synology-tools.js';
 import * as proxmoxTools from './proxmox-tools.js';
 import * as esxiTools from './esxi-tools.js';
+import * as dahuaNvrTools from './dahua-nvr-tools.js';
+import * as dahuaDssTools from './dahua-dss-tools.js';
 
 export const TOOLS: Tool[] = [
   // ============================================================
@@ -1212,6 +1214,228 @@ export const TOOLS: Tool[] = [
       required: ['device_id', 'vm_id', 'snapshot_id'],
     },
   },
+
+  // ============================================================
+  // Dahua NVR/DVR/IPC Tools
+  // ============================================================
+  {
+    name: 'dahua_nvr_system_info',
+    description: 'Get Dahua NVR/DVR system information (model, firmware, serial number)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua NVR device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'dahua_nvr_get_channels',
+    description: 'Get camera channels connected to a Dahua NVR/DVR',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua NVR device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'dahua_nvr_channel_status',
+    description: 'Get video input status of channels on a Dahua NVR',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua NVR device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'dahua_nvr_storage_info',
+    description: 'Get storage/HDD info from a Dahua NVR',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua NVR device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'dahua_nvr_network',
+    description: 'Get network configuration from a Dahua NVR',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua NVR device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'dahua_nvr_alarms',
+    description: 'Get alarm/event history from a Dahua NVR',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua NVR device ID' },
+        count: { type: 'number', description: 'Number of events to retrieve (default 50)' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'dahua_nvr_recording_status',
+    description: 'Get recording status/mode from a Dahua NVR',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua NVR device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'dahua_nvr_ptz',
+    description: 'Control PTZ camera connected to a Dahua NVR (pan, tilt, zoom, preset)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua NVR device ID' },
+        channel: { type: 'number', description: 'Camera channel number (0-based)' },
+        action: { type: 'string', description: 'PTZ action: Up, Down, Left, Right, ZoomWide, ZoomTele, GotoPreset, etc.' },
+        arg1: { type: 'number', description: 'Action argument 1 (speed or preset number, default 0)' },
+        arg2: { type: 'number', description: 'Action argument 2 (default 0)' },
+        arg3: { type: 'number', description: 'Action argument 3 (default 0)' },
+      },
+      required: ['device_id', 'channel', 'action'],
+    },
+  },
+
+  // ============================================================
+  // Dahua DSS Pro/Express Tools
+  // ============================================================
+  {
+    name: 'dss_server_info',
+    description: 'Get Dahua DSS Pro/Express server information',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua DSS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'dss_list_devices',
+    description: 'List devices managed by Dahua DSS platform',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua DSS device ID' },
+        page: { type: 'number', description: 'Page number (default 1)' },
+        page_size: { type: 'number', description: 'Items per page (default 50)' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'dss_device_info',
+    description: 'Get detailed info of a device managed by Dahua DSS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua DSS device ID' },
+        device_code: { type: 'string', description: 'DSS device code' },
+      },
+      required: ['device_id', 'device_code'],
+    },
+  },
+  {
+    name: 'dss_list_channels',
+    description: 'List video channels in Dahua DSS (all or filtered by device)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua DSS device ID' },
+        device_code: { type: 'string', description: 'Filter by device code (optional)' },
+        page: { type: 'number', description: 'Page number (default 1)' },
+        page_size: { type: 'number', description: 'Items per page (default 100)' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'dss_channel_status',
+    description: 'Get online/offline status of channels in Dahua DSS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua DSS device ID' },
+        channel_ids: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of channel IDs to check',
+        },
+      },
+      required: ['device_id', 'channel_ids'],
+    },
+  },
+  {
+    name: 'dss_list_alarms',
+    description: 'List alarms/events from Dahua DSS platform',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua DSS device ID' },
+        start_time: { type: 'string', description: 'Start time filter (ISO format, optional)' },
+        end_time: { type: 'string', description: 'End time filter (ISO format, optional)' },
+        page: { type: 'number', description: 'Page number (default 1)' },
+        page_size: { type: 'number', description: 'Items per page (default 50)' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'dss_list_organizations',
+    description: 'List organizations/groups in Dahua DSS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua DSS device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'dss_record_status',
+    description: 'Get recording status of a channel in Dahua DSS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua DSS device ID' },
+        channel_id: { type: 'string', description: 'Channel ID to check recording status' },
+      },
+      required: ['device_id', 'channel_id'],
+    },
+  },
+  {
+    name: 'dss_device_online_status',
+    description: 'Check online/offline status of devices in Dahua DSS',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Dahua DSS device ID' },
+        device_codes: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of device codes to check',
+        },
+      },
+      required: ['device_id', 'device_codes'],
+    },
+  },
 ];
 
 export type ToolArguments = Record<string, unknown>;
@@ -1440,6 +1664,44 @@ export async function handleToolCall(
       return esxiTools.deleteSnapshot(args as Parameters<typeof esxiTools.deleteSnapshot>[0]);
     case 'esxi_revert_snapshot':
       return esxiTools.revertSnapshot(args as Parameters<typeof esxiTools.revertSnapshot>[0]);
+
+    // Dahua NVR
+    case 'dahua_nvr_system_info':
+      return dahuaNvrTools.getSystemInfo(args as Parameters<typeof dahuaNvrTools.getSystemInfo>[0]);
+    case 'dahua_nvr_get_channels':
+      return dahuaNvrTools.getChannels(args as Parameters<typeof dahuaNvrTools.getChannels>[0]);
+    case 'dahua_nvr_channel_status':
+      return dahuaNvrTools.getChannelStatus(args as Parameters<typeof dahuaNvrTools.getChannelStatus>[0]);
+    case 'dahua_nvr_storage_info':
+      return dahuaNvrTools.getStorageInfo(args as Parameters<typeof dahuaNvrTools.getStorageInfo>[0]);
+    case 'dahua_nvr_network':
+      return dahuaNvrTools.getNetworkConfig(args as Parameters<typeof dahuaNvrTools.getNetworkConfig>[0]);
+    case 'dahua_nvr_alarms':
+      return dahuaNvrTools.getAlarms(args as Parameters<typeof dahuaNvrTools.getAlarms>[0]);
+    case 'dahua_nvr_recording_status':
+      return dahuaNvrTools.getRecordingStatus(args as Parameters<typeof dahuaNvrTools.getRecordingStatus>[0]);
+    case 'dahua_nvr_ptz':
+      return dahuaNvrTools.ptzControl(args as Parameters<typeof dahuaNvrTools.ptzControl>[0]);
+
+    // Dahua DSS
+    case 'dss_server_info':
+      return dahuaDssTools.getServerInfo(args as Parameters<typeof dahuaDssTools.getServerInfo>[0]);
+    case 'dss_list_devices':
+      return dahuaDssTools.listDevices(args as Parameters<typeof dahuaDssTools.listDevices>[0]);
+    case 'dss_device_info':
+      return dahuaDssTools.getDeviceInfo(args as Parameters<typeof dahuaDssTools.getDeviceInfo>[0]);
+    case 'dss_list_channels':
+      return dahuaDssTools.listChannels(args as Parameters<typeof dahuaDssTools.listChannels>[0]);
+    case 'dss_channel_status':
+      return dahuaDssTools.getChannelStatus(args as Parameters<typeof dahuaDssTools.getChannelStatus>[0]);
+    case 'dss_list_alarms':
+      return dahuaDssTools.listAlarms(args as Parameters<typeof dahuaDssTools.listAlarms>[0]);
+    case 'dss_list_organizations':
+      return dahuaDssTools.listOrganizations(args as Parameters<typeof dahuaDssTools.listOrganizations>[0]);
+    case 'dss_record_status':
+      return dahuaDssTools.getRecordStatus(args as Parameters<typeof dahuaDssTools.getRecordStatus>[0]);
+    case 'dss_device_online_status':
+      return dahuaDssTools.getDeviceOnlineStatus(args as Parameters<typeof dahuaDssTools.getDeviceOnlineStatus>[0]);
 
     default:
       throw new Error(`Unknown tool: ${name}`);
