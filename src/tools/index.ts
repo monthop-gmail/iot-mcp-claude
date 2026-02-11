@@ -14,6 +14,7 @@ import * as proxmoxTools from './proxmox-tools.js';
 import * as esxiTools from './esxi-tools.js';
 import * as dahuaNvrTools from './dahua-nvr-tools.js';
 import * as dahuaDssTools from './dahua-dss-tools.js';
+import * as openstackTools from './openstack-tools.js';
 
 export const TOOLS: Tool[] = [
   // ============================================================
@@ -1436,6 +1437,145 @@ export const TOOLS: Tool[] = [
       required: ['device_id', 'device_codes'],
     },
   },
+
+  // ============================================================
+  // OpenStack / MicroStack Tools
+  // ============================================================
+  {
+    name: 'openstack_list_servers',
+    description: 'List all compute instances (VMs) in OpenStack',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'OpenStack device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'openstack_server_detail',
+    description: 'Get detailed info of a specific server/instance in OpenStack',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'OpenStack device ID' },
+        server_id: { type: 'string', description: 'Server/instance UUID' },
+      },
+      required: ['device_id', 'server_id'],
+    },
+  },
+  {
+    name: 'openstack_server_action',
+    description: 'Perform an action on an OpenStack server (start, stop, reboot, pause, suspend, resume)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'OpenStack device ID' },
+        server_id: { type: 'string', description: 'Server/instance UUID' },
+        action: { type: 'string', enum: ['start', 'stop', 'reboot', 'hard-reboot', 'pause', 'unpause', 'suspend', 'resume'], description: 'Action to perform' },
+      },
+      required: ['device_id', 'server_id', 'action'],
+    },
+  },
+  {
+    name: 'openstack_list_flavors',
+    description: 'List available VM flavors (sizes) in OpenStack',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'OpenStack device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'openstack_list_hypervisors',
+    description: 'List hypervisors in OpenStack with resource stats',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'OpenStack device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'openstack_list_images',
+    description: 'List available images in OpenStack (Glance)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'OpenStack device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'openstack_list_networks',
+    description: 'List networks in OpenStack (Neutron)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'OpenStack device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'openstack_list_subnets',
+    description: 'List subnets in OpenStack (Neutron)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'OpenStack device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'openstack_list_routers',
+    description: 'List routers in OpenStack (Neutron)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'OpenStack device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'openstack_list_floating_ips',
+    description: 'List floating IPs in OpenStack (Neutron)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'OpenStack device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'openstack_list_volumes',
+    description: 'List block storage volumes in OpenStack (Cinder)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'OpenStack device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'openstack_list_projects',
+    description: 'List projects/tenants in OpenStack (Keystone)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'OpenStack device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
 ];
 
 export type ToolArguments = Record<string, unknown>;
@@ -1702,6 +1842,32 @@ export async function handleToolCall(
       return dahuaDssTools.getRecordStatus(args as Parameters<typeof dahuaDssTools.getRecordStatus>[0]);
     case 'dss_device_online_status':
       return dahuaDssTools.getDeviceOnlineStatus(args as Parameters<typeof dahuaDssTools.getDeviceOnlineStatus>[0]);
+
+    // OpenStack
+    case 'openstack_list_servers':
+      return openstackTools.listServers(args as Parameters<typeof openstackTools.listServers>[0]);
+    case 'openstack_server_detail':
+      return openstackTools.getServerDetail(args as Parameters<typeof openstackTools.getServerDetail>[0]);
+    case 'openstack_server_action':
+      return openstackTools.serverAction(args as Parameters<typeof openstackTools.serverAction>[0]);
+    case 'openstack_list_flavors':
+      return openstackTools.listFlavors(args as Parameters<typeof openstackTools.listFlavors>[0]);
+    case 'openstack_list_hypervisors':
+      return openstackTools.listHypervisors(args as Parameters<typeof openstackTools.listHypervisors>[0]);
+    case 'openstack_list_images':
+      return openstackTools.listImages(args as Parameters<typeof openstackTools.listImages>[0]);
+    case 'openstack_list_networks':
+      return openstackTools.listNetworks(args as Parameters<typeof openstackTools.listNetworks>[0]);
+    case 'openstack_list_subnets':
+      return openstackTools.listSubnets(args as Parameters<typeof openstackTools.listSubnets>[0]);
+    case 'openstack_list_routers':
+      return openstackTools.listRouters(args as Parameters<typeof openstackTools.listRouters>[0]);
+    case 'openstack_list_floating_ips':
+      return openstackTools.listFloatingIps(args as Parameters<typeof openstackTools.listFloatingIps>[0]);
+    case 'openstack_list_volumes':
+      return openstackTools.listVolumes(args as Parameters<typeof openstackTools.listVolumes>[0]);
+    case 'openstack_list_projects':
+      return openstackTools.listProjects(args as Parameters<typeof openstackTools.listProjects>[0]);
 
     default:
       throw new Error(`Unknown tool: ${name}`);

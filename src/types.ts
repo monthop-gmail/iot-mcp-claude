@@ -15,7 +15,8 @@ export type DeviceType =
   | 'proxmox'
   | 'esxi'
   | 'dahua-nvr'
-  | 'dahua-dss';
+  | 'dahua-dss'
+  | 'openstack';
 
 export type ConnectionStatus = 'connected' | 'disconnected' | 'error' | 'unknown';
 

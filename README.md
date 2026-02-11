@@ -2,7 +2,7 @@
 
 MCP (Model Context Protocol) Server สำหรับจัดการอุปกรณ์ IoT และ Network ผ่าน Claude AI
 
-รองรับ **114 tools** สำหรับ **15 ประเภทอุปกรณ์** ผ่าน 3 protocols: SSH, REST API, Serial
+รองรับ **126 tools** สำหรับ **16 ประเภทอุปกรณ์** ผ่าน 3 protocols: SSH, REST API, Serial
 
 ## Supported Devices
 
@@ -23,6 +23,7 @@ MCP (Model Context Protocol) Server สำหรับจัดการอุ�
 | **VMware ESXi** | REST API (vSphere) | 13 tools - VMs, power, snapshots, host, datastores, networks |
 | **Dahua NVR/DVR** | HTTP CGI API | 8 tools - system info, channels, storage, alarms, recording, PTZ |
 | **Dahua DSS** | REST API (token) | 9 tools - server info, devices, channels, alarms, organizations |
+| **OpenStack/MicroStack** | REST API (Keystone v3) | 12 tools - servers, flavors, hypervisors, images, networks, volumes |
 
 Plus **8 cross-device tools**: list devices, status, test connection, execute command, get config, serial ports, VPN status
 
@@ -55,9 +56,10 @@ src/
 │   ├── esxi-connector.ts     # VMware vSphere REST API
 │   ├── dahua-nvr-connector.ts # Dahua NVR/DVR/IPC CGI API
 │   ├── dahua-dss-connector.ts # Dahua DSS Pro/Express REST API
+│   ├── openstack-connector.ts # OpenStack/MicroStack (Keystone v3)
 │   └── index.ts                # connector factory
 └── tools/
-    ├── index.ts                # 114 tool definitions + dispatcher
+    ├── index.ts                # 126 tool definitions + dispatcher
     ├── device-tools.ts         # cross-device operations
     ├── network-switch-tools.ts # Cisco + HP
     ├── firewall-tools.ts       # Fortigate
@@ -72,7 +74,8 @@ src/
     ├── proxmox-tools.ts       # Proxmox
     ├── esxi-tools.ts          # ESXi
     ├── dahua-nvr-tools.ts     # Dahua NVR
-    └── dahua-dss-tools.ts     # Dahua DSS
+    ├── dahua-dss-tools.ts     # Dahua DSS
+    └── openstack-tools.ts     # OpenStack
 ```
 
 ### Connector Pattern
@@ -95,7 +98,8 @@ BaseConnector (abstract)
 │   ├── ProxmoxConnector (PVE API)
 │   ├── ESXiConnector (vSphere REST API)
 │   ├── DahuaNvrConnector (HTTP CGI, Basic auth)
-│   └── DahuaDssConnector (REST API, token auth)
+│   ├── DahuaDssConnector (REST API, token auth)
+│   └── OpenStackConnector (Keystone v3 + Nova/Neutron/Cinder/Glance)
 └── SerialConnector (serialport)
 ```
 
@@ -335,6 +339,22 @@ npm start           # stdio mode (for Claude Desktop)
 | `dss_record_status` | Channel recording status |
 | `dss_device_online_status` | Device online/offline check |
 
+### OpenStack / MicroStack (`openstack_*`)
+| Tool | Description |
+|------|-------------|
+| `openstack_list_servers` | List compute instances (VMs) |
+| `openstack_server_detail` | Server/instance details |
+| `openstack_server_action` | Start/stop/reboot/pause/suspend/resume server |
+| `openstack_list_flavors` | Available VM flavors (sizes) |
+| `openstack_list_hypervisors` | Hypervisors with resource stats |
+| `openstack_list_images` | Available images (Glance) |
+| `openstack_list_networks` | Networks (Neutron) |
+| `openstack_list_subnets` | Subnets (Neutron) |
+| `openstack_list_routers` | Routers (Neutron) |
+| `openstack_list_floating_ips` | Floating IPs (Neutron) |
+| `openstack_list_volumes` | Block storage volumes (Cinder) |
+| `openstack_list_projects` | Projects/tenants (Keystone) |
+
 ## VPN Support
 
 Container รองรับ 5 VPN protocols เพื่อเข้าถึงอุปกรณ์ที่อยู่หลัง VPN:
@@ -430,6 +450,7 @@ CF_TUNNEL_TOKEN=eyJhIjoixxxxxxx...
 | `esxi` | `host`, `username`, `password` (vSphere REST API, ESXi 6.5+) |
 | `dahua-nvr` | `apiUrl`, `username`, `password` (HTTP CGI API, Basic auth) |
 | `dahua-dss` | `apiUrl`, `username`, `password` (REST API, token auth) |
+| `openstack` | `apiUrl` (Keystone), `username`, `password`, `extra.project`, `extra.domain` |
 
 ### Docker Serial Port
 

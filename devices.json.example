@@ -162,6 +162,20 @@
       "username": "system",
       "password": "${DAHUA_DSS_PASSWORD}",
       "tags": ["cctv", "vms", "surveillance"]
+    },
+    {
+      "id": "openstack-01",
+      "name": "OpenStack Cloud",
+      "type": "openstack",
+      "transport": ["rest"],
+      "apiUrl": "http://192.168.1.20:5000",
+      "username": "admin",
+      "password": "${OPENSTACK_PASSWORD}",
+      "extra": {
+        "project": "admin",
+        "domain": "Default"
+      },
+      "tags": ["cloud", "hypervisor", "openstack"]
     }
   ]
 }
