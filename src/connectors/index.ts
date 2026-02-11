@@ -11,6 +11,7 @@ import { TuyaConnector } from './tuya-connector.js';
 import { SonoffConnector } from './sonoff-connector.js';
 import { QnapConnector } from './qnap-connector.js';
 import { SynologyConnector } from './synology-connector.js';
+import { ProxmoxConnector } from './proxmox-connector.js';
 
 const factories: Record<DeviceType, (c: DeviceConfig) => BaseConnector> = {
   cisco:       (c) => new CiscoConnector(c),
@@ -24,6 +25,7 @@ const factories: Record<DeviceType, (c: DeviceConfig) => BaseConnector> = {
   sonoff:      (c) => new SonoffConnector(c),
   qnap:        (c) => new QnapConnector(c),
   synology:    (c) => new SynologyConnector(c),
+  proxmox:     (c) => new ProxmoxConnector(c),
 };
 
 export function createConnector(config: DeviceConfig): BaseConnector {
@@ -47,3 +49,4 @@ export { TuyaConnector } from './tuya-connector.js';
 export { SonoffConnector } from './sonoff-connector.js';
 export { QnapConnector } from './qnap-connector.js';
 export { SynologyConnector } from './synology-connector.js';
+export { ProxmoxConnector } from './proxmox-connector.js';

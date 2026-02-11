@@ -10,6 +10,7 @@ import * as tuyaTools from './tuya-tools.js';
 import * as sonoffTools from './sonoff-tools.js';
 import * as qnapTools from './qnap-tools.js';
 import * as synologyTools from './synology-tools.js';
+import * as proxmoxTools from './proxmox-tools.js';
 
 export const TOOLS: Tool[] = [
   // ============================================================
@@ -919,6 +920,132 @@ export const TOOLS: Tool[] = [
       required: ['device_id'],
     },
   },
+
+  // ============================================================
+  // Proxmox VE Tools
+  // ============================================================
+  {
+    name: 'proxmox_get_nodes',
+    description: 'List all nodes in the Proxmox cluster',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Proxmox server device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'proxmox_node_status',
+    description: 'Get detailed status of a Proxmox node (CPU, memory, uptime)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Proxmox server device ID' },
+        node: { type: 'string', description: 'Node name (e.g. "pve")' },
+      },
+      required: ['device_id', 'node'],
+    },
+  },
+  {
+    name: 'proxmox_list_vms',
+    description: 'List QEMU virtual machines on a Proxmox node',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Proxmox server device ID' },
+        node: { type: 'string', description: 'Node name' },
+      },
+      required: ['device_id', 'node'],
+    },
+  },
+  {
+    name: 'proxmox_vm_status',
+    description: 'Get status of a specific VM on Proxmox',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Proxmox server device ID' },
+        node: { type: 'string', description: 'Node name' },
+        vmid: { type: 'number', description: 'VM ID (e.g. 100)' },
+      },
+      required: ['device_id', 'node', 'vmid'],
+    },
+  },
+  {
+    name: 'proxmox_list_containers',
+    description: 'List LXC containers on a Proxmox node',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Proxmox server device ID' },
+        node: { type: 'string', description: 'Node name' },
+      },
+      required: ['device_id', 'node'],
+    },
+  },
+  {
+    name: 'proxmox_container_status',
+    description: 'Get status of a specific LXC container on Proxmox',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Proxmox server device ID' },
+        node: { type: 'string', description: 'Node name' },
+        vmid: { type: 'number', description: 'Container ID (e.g. 200)' },
+      },
+      required: ['device_id', 'node', 'vmid'],
+    },
+  },
+  {
+    name: 'proxmox_get_storage',
+    description: 'List storage pools on a Proxmox node',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Proxmox server device ID' },
+        node: { type: 'string', description: 'Node name' },
+      },
+      required: ['device_id', 'node'],
+    },
+  },
+  {
+    name: 'proxmox_get_network',
+    description: 'Get network configuration of a Proxmox node',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Proxmox server device ID' },
+        node: { type: 'string', description: 'Node name' },
+      },
+      required: ['device_id', 'node'],
+    },
+  },
+  {
+    name: 'proxmox_cluster_resources',
+    description: 'Get cluster-wide resource overview from Proxmox (all VMs, containers, storage, nodes)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Proxmox server device ID' },
+        type: { type: 'string', description: 'Filter by type: vm, storage, node (optional, returns all if omitted)' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'proxmox_get_tasks',
+    description: 'Get recent tasks/operations from a Proxmox node',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'Proxmox server device ID' },
+        node: { type: 'string', description: 'Node name' },
+        limit: { type: 'number', description: 'Number of tasks (default 50)' },
+      },
+      required: ['device_id', 'node'],
+    },
+  },
 ];
 
 export type ToolArguments = Record<string, unknown>;
@@ -1097,6 +1224,28 @@ export async function handleToolCall(
       return synologyTools.getSystemLogs(args as Parameters<typeof synologyTools.getSystemLogs>[0]);
     case 'synology_get_docker':
       return synologyTools.getDockerContainers(args as Parameters<typeof synologyTools.getDockerContainers>[0]);
+
+    // Proxmox
+    case 'proxmox_get_nodes':
+      return proxmoxTools.getNodes(args as Parameters<typeof proxmoxTools.getNodes>[0]);
+    case 'proxmox_node_status':
+      return proxmoxTools.getNodeStatus(args as Parameters<typeof proxmoxTools.getNodeStatus>[0]);
+    case 'proxmox_list_vms':
+      return proxmoxTools.listVMs(args as Parameters<typeof proxmoxTools.listVMs>[0]);
+    case 'proxmox_vm_status':
+      return proxmoxTools.getVMStatus(args as Parameters<typeof proxmoxTools.getVMStatus>[0]);
+    case 'proxmox_list_containers':
+      return proxmoxTools.listContainers(args as Parameters<typeof proxmoxTools.listContainers>[0]);
+    case 'proxmox_container_status':
+      return proxmoxTools.getContainerStatus(args as Parameters<typeof proxmoxTools.getContainerStatus>[0]);
+    case 'proxmox_get_storage':
+      return proxmoxTools.getStorage(args as Parameters<typeof proxmoxTools.getStorage>[0]);
+    case 'proxmox_get_network':
+      return proxmoxTools.getNetwork(args as Parameters<typeof proxmoxTools.getNetwork>[0]);
+    case 'proxmox_cluster_resources':
+      return proxmoxTools.getClusterResources(args as Parameters<typeof proxmoxTools.getClusterResources>[0]);
+    case 'proxmox_get_tasks':
+      return proxmoxTools.getTasks(args as Parameters<typeof proxmoxTools.getTasks>[0]);
 
     default:
       throw new Error(`Unknown tool: ${name}`);

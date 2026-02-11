@@ -11,7 +11,8 @@ export type DeviceType =
   | 'tuya'
   | 'sonoff'
   | 'qnap'
-  | 'synology';
+  | 'synology'
+  | 'proxmox';
 
 export type ConnectionStatus = 'connected' | 'disconnected' | 'error' | 'unknown';
 

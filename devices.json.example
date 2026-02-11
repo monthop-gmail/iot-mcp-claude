@@ -122,6 +122,16 @@
       "username": "admin",
       "password": "${SYNOLOGY_PASSWORD}",
       "tags": ["storage", "nas"]
+    },
+    {
+      "id": "proxmox-01",
+      "name": "Proxmox Server",
+      "type": "proxmox",
+      "transport": ["rest"],
+      "apiUrl": "https://192.168.1.10:8006",
+      "username": "root@pam",
+      "password": "${PROXMOX_PASSWORD}",
+      "tags": ["hypervisor", "server"]
     }
   ]
 }
