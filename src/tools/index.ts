@@ -11,6 +11,7 @@ import * as sonoffTools from './sonoff-tools.js';
 import * as qnapTools from './qnap-tools.js';
 import * as synologyTools from './synology-tools.js';
 import * as proxmoxTools from './proxmox-tools.js';
+import * as esxiTools from './esxi-tools.js';
 
 export const TOOLS: Tool[] = [
   // ============================================================
@@ -1046,6 +1047,171 @@ export const TOOLS: Tool[] = [
       required: ['device_id', 'node'],
     },
   },
+
+  // ============================================================
+  // ESXi / vSphere Tools
+  // ============================================================
+  {
+    name: 'esxi_list_vms',
+    description: 'List all VMs on an ESXi host with power state',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+        filter: { type: 'string', description: 'Filter by VM name or power state (optional)' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'esxi_get_vm',
+    description: 'Get detailed information about a specific VM on ESXi',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+        vm_id: { type: 'string', description: 'VM identifier (e.g. vm-1)' },
+        vm_name: { type: 'string', description: 'VM name (alternative to vm_id)' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'esxi_power_on',
+    description: 'Power on a VM on ESXi',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+        vm_id: { type: 'string', description: 'VM identifier' },
+      },
+      required: ['device_id', 'vm_id'],
+    },
+  },
+  {
+    name: 'esxi_power_off',
+    description: 'Power off a VM on ESXi. Tries graceful shutdown first, falls back to force',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+        vm_id: { type: 'string', description: 'VM identifier' },
+        force: { type: 'boolean', description: 'Force power off without graceful shutdown (default: false)' },
+      },
+      required: ['device_id', 'vm_id'],
+    },
+  },
+  {
+    name: 'esxi_restart_vm',
+    description: 'Restart a VM on ESXi',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+        vm_id: { type: 'string', description: 'VM identifier' },
+        graceful: { type: 'boolean', description: 'Use graceful reboot via VMware Tools (default: false)' },
+      },
+      required: ['device_id', 'vm_id'],
+    },
+  },
+  {
+    name: 'esxi_suspend_vm',
+    description: 'Suspend a VM on ESXi',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+        vm_id: { type: 'string', description: 'VM identifier' },
+      },
+      required: ['device_id', 'vm_id'],
+    },
+  },
+  {
+    name: 'esxi_host_info',
+    description: 'Get ESXi host information (CPU, memory, version)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'esxi_list_datastores',
+    description: 'List all datastores on ESXi with capacity and usage',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'esxi_list_networks',
+    description: 'List all networks and port groups on ESXi',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+      },
+      required: ['device_id'],
+    },
+  },
+  {
+    name: 'esxi_list_snapshots',
+    description: 'List all snapshots of a VM on ESXi',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+        vm_id: { type: 'string', description: 'VM identifier' },
+      },
+      required: ['device_id', 'vm_id'],
+    },
+  },
+  {
+    name: 'esxi_create_snapshot',
+    description: 'Create a snapshot of a VM on ESXi',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+        vm_id: { type: 'string', description: 'VM identifier' },
+        name: { type: 'string', description: 'Snapshot name' },
+        description: { type: 'string', description: 'Snapshot description (optional)' },
+        memory: { type: 'boolean', description: 'Include memory state (default: false)' },
+      },
+      required: ['device_id', 'vm_id', 'name'],
+    },
+  },
+  {
+    name: 'esxi_delete_snapshot',
+    description: 'Delete a snapshot from a VM on ESXi',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+        vm_id: { type: 'string', description: 'VM identifier' },
+        snapshot_id: { type: 'string', description: 'Snapshot identifier' },
+      },
+      required: ['device_id', 'vm_id', 'snapshot_id'],
+    },
+  },
+  {
+    name: 'esxi_revert_snapshot',
+    description: 'Revert a VM to a specific snapshot on ESXi',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        device_id: { type: 'string', description: 'ESXi host device ID' },
+        vm_id: { type: 'string', description: 'VM identifier' },
+        snapshot_id: { type: 'string', description: 'Snapshot identifier to revert to' },
+      },
+      required: ['device_id', 'vm_id', 'snapshot_id'],
+    },
+  },
 ];
 
 export type ToolArguments = Record<string, unknown>;
@@ -1246,6 +1412,34 @@ export async function handleToolCall(
       return proxmoxTools.getClusterResources(args as Parameters<typeof proxmoxTools.getClusterResources>[0]);
     case 'proxmox_get_tasks':
       return proxmoxTools.getTasks(args as Parameters<typeof proxmoxTools.getTasks>[0]);
+
+    // ESXi
+    case 'esxi_list_vms':
+      return esxiTools.listVMs(args as Parameters<typeof esxiTools.listVMs>[0]);
+    case 'esxi_get_vm':
+      return esxiTools.getVM(args as Parameters<typeof esxiTools.getVM>[0]);
+    case 'esxi_power_on':
+      return esxiTools.powerOn(args as Parameters<typeof esxiTools.powerOn>[0]);
+    case 'esxi_power_off':
+      return esxiTools.powerOff(args as Parameters<typeof esxiTools.powerOff>[0]);
+    case 'esxi_restart_vm':
+      return esxiTools.restartVM(args as Parameters<typeof esxiTools.restartVM>[0]);
+    case 'esxi_suspend_vm':
+      return esxiTools.suspendVM(args as Parameters<typeof esxiTools.suspendVM>[0]);
+    case 'esxi_host_info':
+      return esxiTools.getHostInfo(args as Parameters<typeof esxiTools.getHostInfo>[0]);
+    case 'esxi_list_datastores':
+      return esxiTools.listDatastores(args as Parameters<typeof esxiTools.listDatastores>[0]);
+    case 'esxi_list_networks':
+      return esxiTools.listNetworks(args as Parameters<typeof esxiTools.listNetworks>[0]);
+    case 'esxi_list_snapshots':
+      return esxiTools.listSnapshots(args as Parameters<typeof esxiTools.listSnapshots>[0]);
+    case 'esxi_create_snapshot':
+      return esxiTools.createSnapshot(args as Parameters<typeof esxiTools.createSnapshot>[0]);
+    case 'esxi_delete_snapshot':
+      return esxiTools.deleteSnapshot(args as Parameters<typeof esxiTools.deleteSnapshot>[0]);
+    case 'esxi_revert_snapshot':
+      return esxiTools.revertSnapshot(args as Parameters<typeof esxiTools.revertSnapshot>[0]);
 
     default:
       throw new Error(`Unknown tool: ${name}`);

@@ -2,7 +2,7 @@
 
 MCP (Model Context Protocol) Server สำหรับจัดการอุปกรณ์ IoT และ Network ผ่าน Claude AI
 
-รองรับ **84 tools** สำหรับ **12 ประเภทอุปกรณ์** ผ่าน 3 protocols: SSH, REST API, Serial
+รองรับ **97 tools** สำหรับ **13 ประเภทอุปกรณ์** ผ่าน 3 protocols: SSH, REST API, Serial
 
 ## Supported Devices
 
@@ -20,6 +20,7 @@ MCP (Model Context Protocol) Server สำหรับจัดการอุ�
 | **QNAP NAS** | REST API (QTS) | 8 tools - system info, volumes, disks, shared folders, apps, logs |
 | **Synology NAS** | REST API (DSM) | 9 tools - system info, storage, disks, shared folders, packages, docker |
 | **Proxmox VE** | REST API (PVE) | 10 tools - nodes, VMs, LXC containers, storage, cluster resources |
+| **VMware ESXi** | REST API (vSphere) | 13 tools - VMs, power, snapshots, host, datastores, networks |
 
 Plus **7 cross-device tools**: list devices, status, test connection, execute command, get config, serial ports
 
@@ -49,6 +50,7 @@ src/
 │   ├── qnap-connector.ts      # QNAP QTS API
 │   ├── synology-connector.ts  # Synology DSM API
 │   ├── proxmox-connector.ts   # Proxmox VE API
+│   ├── esxi-connector.ts     # VMware vSphere REST API
 │   └── index.ts                # connector factory
 └── tools/
     ├── index.ts                # 56 tool definitions + dispatcher
@@ -63,7 +65,8 @@ src/
     ├── sonoff-tools.ts         # Sonoff
     ├── qnap-tools.ts          # QNAP
     ├── synology-tools.ts      # Synology
-    └── proxmox-tools.ts       # Proxmox
+    ├── proxmox-tools.ts       # Proxmox
+    └── esxi-tools.ts          # ESXi
 ```
 
 ### Connector Pattern
@@ -83,7 +86,8 @@ BaseConnector (abstract)
 │   ├── SonoffConnector (eWeLink v2)
 │   ├── QnapConnector (QTS API)
 │   ├── SynologyConnector (DSM API)
-│   └── ProxmoxConnector (PVE API)
+│   ├── ProxmoxConnector (PVE API)
+│   └── ESXiConnector (vSphere REST API)
 └── SerialConnector (serialport)
 ```
 
@@ -280,6 +284,23 @@ npm start           # stdio mode (for Claude Desktop)
 | `proxmox_cluster_resources` | Cluster-wide resource overview |
 | `proxmox_get_tasks` | Recent tasks/operations |
 
+### VMware ESXi (`esxi_*`)
+| Tool | Description |
+|------|-------------|
+| `esxi_list_vms` | List all VMs with power state |
+| `esxi_get_vm` | VM details (by ID or name) |
+| `esxi_power_on` | Power on VM |
+| `esxi_power_off` | Power off VM (graceful/force) |
+| `esxi_restart_vm` | Restart VM |
+| `esxi_suspend_vm` | Suspend VM |
+| `esxi_host_info` | Host info (CPU, memory, version) |
+| `esxi_list_datastores` | Datastores with capacity/usage |
+| `esxi_list_networks` | Networks and port groups |
+| `esxi_list_snapshots` | VM snapshots |
+| `esxi_create_snapshot` | Create VM snapshot |
+| `esxi_delete_snapshot` | Delete VM snapshot |
+| `esxi_revert_snapshot` | Revert VM to snapshot |
+
 ## VPN Support
 
 Container รองรับ 5 VPN protocols เพื่อเข้าถึงอุปกรณ์ที่อยู่หลัง VPN:
@@ -372,6 +393,7 @@ CF_TUNNEL_TOKEN=eyJhIjoixxxxxxx...
 | `qnap` | `apiUrl`, `username`, `password` |
 | `synology` | `apiUrl`, `username`, `password` |
 | `proxmox` | `apiUrl`, `username`, `password` (or `apiKey` for API token) |
+| `esxi` | `host`, `username`, `password` (vSphere REST API, ESXi 6.5+) |
 
 ### Docker Serial Port
 

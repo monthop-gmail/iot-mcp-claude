@@ -12,6 +12,7 @@ import { SonoffConnector } from './sonoff-connector.js';
 import { QnapConnector } from './qnap-connector.js';
 import { SynologyConnector } from './synology-connector.js';
 import { ProxmoxConnector } from './proxmox-connector.js';
+import { ESXiConnector } from './esxi-connector.js';
 
 const factories: Record<DeviceType, (c: DeviceConfig) => BaseConnector> = {
   cisco:       (c) => new CiscoConnector(c),
@@ -26,6 +27,7 @@ const factories: Record<DeviceType, (c: DeviceConfig) => BaseConnector> = {
   qnap:        (c) => new QnapConnector(c),
   synology:    (c) => new SynologyConnector(c),
   proxmox:     (c) => new ProxmoxConnector(c),
+  esxi:        (c) => new ESXiConnector(c),
 };
 
 export function createConnector(config: DeviceConfig): BaseConnector {
@@ -50,3 +52,4 @@ export { SonoffConnector } from './sonoff-connector.js';
 export { QnapConnector } from './qnap-connector.js';
 export { SynologyConnector } from './synology-connector.js';
 export { ProxmoxConnector } from './proxmox-connector.js';
+export { ESXiConnector } from './esxi-connector.js';

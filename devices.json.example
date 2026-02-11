@@ -132,6 +132,16 @@
       "username": "root@pam",
       "password": "${PROXMOX_PASSWORD}",
       "tags": ["hypervisor", "server"]
+    },
+    {
+      "id": "esxi-01",
+      "name": "ESXi Server",
+      "type": "esxi",
+      "transport": ["rest"],
+      "host": "192.168.1.11",
+      "username": "root",
+      "password": "${ESXI_PASSWORD}",
+      "tags": ["hypervisor", "server"]
     }
   ]
 }

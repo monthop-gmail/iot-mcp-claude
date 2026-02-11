@@ -12,7 +12,8 @@ export type DeviceType =
   | 'sonoff'
   | 'qnap'
   | 'synology'
-  | 'proxmox';
+  | 'proxmox'
+  | 'esxi';
 
 export type ConnectionStatus = 'connected' | 'disconnected' | 'error' | 'unknown';
 
