@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "iot": {
-      "url": "http://localhost:3300/sse"
+      "url": "http://localhost:3300/mcp"
     }
   }
 }
