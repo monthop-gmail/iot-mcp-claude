@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import http from 'http';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
+  isInitializeRequest,
 } from '@modelcontextprotocol/sdk/types.js';
 import { config, validateConfig } from './config.js';
 import { TOOLS, handleToolCall } from './tools/index.js';
@@ -67,15 +68,15 @@ function createMCPServer(): Server {
   return mcpServer;
 }
 
-// Active SSE connections
-const connections = new Map<string, SSEServerTransport>();
+// Active Streamable HTTP transports
+const transports = new Map<string, StreamableHTTPServerTransport>();
 
-// HTTP Server for SSE
+// HTTP Server
 const httpServer = http.createServer(async (req, res) => {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, mcp-session-id');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
@@ -91,50 +92,82 @@ const httpServer = http.createServer(async (req, res) => {
     res.end(JSON.stringify({
       status: 'ok',
       server: 'iot-mcp-claude',
+      transport: 'streamable-http',
       tools: TOOLS.length,
       toolNames: TOOLS.map(t => t.name),
     }));
     return;
   }
 
-  // SSE endpoint
-  if (url.pathname === '/sse') {
-    const mcpServer = createMCPServer();
-    const transport = new SSEServerTransport('/message', res);
-    const sessionId = crypto.randomUUID();
+  // Streamable HTTP endpoint
+  if (url.pathname === '/mcp') {
+    if (req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => { body += chunk; });
+      req.on('end', async () => {
+        try {
+          const jsonBody = JSON.parse(body);
+          const sessionId = req.headers['mcp-session-id'] as string;
 
-    connections.set(sessionId, transport);
+          let transport: StreamableHTTPServerTransport;
 
-    res.on('close', () => {
-      connections.delete(sessionId);
-    });
+          if (sessionId && transports.has(sessionId)) {
+            transport = transports.get(sessionId)!;
+          } else if (!sessionId && isInitializeRequest(jsonBody)) {
+            transport = new StreamableHTTPServerTransport({
+              sessionIdGenerator: () => crypto.randomUUID(),
+              onsessioninitialized: (sid) => {
+                transports.set(sid, transport);
+              },
+            });
+            transport.onclose = () => {
+              const sid = transport.sessionId;
+              if (sid) transports.delete(sid);
+            };
+            const server = createMCPServer();
+            await server.connect(transport);
+          } else {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              jsonrpc: '2.0',
+              error: { code: -32000, message: 'Bad Request: No valid session ID' },
+              id: null,
+            }));
+            return;
+          }
 
-    await mcpServer.connect(transport);
-    return;
-  }
-
-  // Message endpoint for SSE
-  if (url.pathname === '/message' && req.method === 'POST') {
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk;
-    });
-
-    req.on('end', async () => {
-      try {
-        for (const transport of connections.values()) {
-          await transport.handlePostMessage(req, res, body);
-          return;
+          await transport.handleRequest(req, res, jsonBody);
+        } catch (error) {
+          if (!res.headersSent) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: String(error) }));
+          }
         }
+      });
+      return;
+    }
 
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'No active SSE connection' }));
-      } catch (error) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: String(error) }));
+    if (req.method === 'GET') {
+      const sessionId = req.headers['mcp-session-id'] as string;
+      if (!sessionId || !transports.has(sessionId)) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid or missing session ID' }));
+        return;
       }
-    });
-    return;
+      await transports.get(sessionId)!.handleRequest(req, res);
+      return;
+    }
+
+    if (req.method === 'DELETE') {
+      const sessionId = req.headers['mcp-session-id'] as string;
+      if (!sessionId || !transports.has(sessionId)) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid or missing session ID' }));
+        return;
+      }
+      await transports.get(sessionId)!.handleRequest(req, res);
+      return;
+    }
   }
 
   // 404 for unknown routes
@@ -144,9 +177,9 @@ const httpServer = http.createServer(async (req, res) => {
 
 // Start HTTP server
 httpServer.listen(config.sse.port, config.sse.host, () => {
-  console.log(`IoT MCP Server (SSE) running at http://${config.sse.host}:${config.sse.port}`);
+  console.log(`IoT MCP Server (Streamable HTTP) running at http://${config.sse.host}:${config.sse.port}`);
   console.log(`Tools: ${TOOLS.length}`);
   console.log('Endpoints:');
-  console.log(`  - SSE: http://${config.sse.host}:${config.sse.port}/sse`);
+  console.log(`  - MCP: http://${config.sse.host}:${config.sse.port}/mcp`);
   console.log(`  - Health: http://${config.sse.host}:${config.sse.port}/health`);
 });

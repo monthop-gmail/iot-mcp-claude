@@ -33,7 +33,7 @@ Plus **8 cross-device tools**: list devices, status, test connection, execute co
 ```
 src/
 ├── index.ts                    # stdio transport
-├── server-sse.ts               # SSE HTTP transport
+├── server-sse.ts               # Streamable HTTP transport
 ├── config.ts                   # env + devices.json loader
 ├── types.ts                    # shared interfaces
 ├── device-registry.ts          # singleton device registry
@@ -142,14 +142,14 @@ Edit `devices.json` with your device inventory. Passwords use `${ENV_VAR}` refer
 docker compose up -d
 ```
 
-Server runs at `http://localhost:3300` (SSE endpoint: `/sse`, health: `/health`)
+Server runs at `http://localhost:3300` (MCP endpoint: `/mcp`, health: `/health`)
 
 ### 3. Standalone
 
 ```bash
 npm install
 npm run build
-npm run start:sse   # SSE HTTP mode (port 3000)
+npm run start:sse   # Streamable HTTP mode (port 3000)
 npm start           # stdio mode (for Claude Desktop)
 ```
 
@@ -161,7 +161,7 @@ npm start           # stdio mode (for Claude Desktop)
 {
   "mcpServers": {
     "iot": {
-      "url": "http://localhost:3300/sse"
+      "url": "http://localhost:3300/mcp"
     }
   }
 }
